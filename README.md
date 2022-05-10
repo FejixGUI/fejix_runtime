@@ -18,12 +18,11 @@ Allocation of windows and widgets is not handled by Fejix runtime.
 
 ## Build
 
-1. Install Xmake [like this](https://xmake.io/#/getting_started?id=installation).
-2. Configure:
-   ```sh
-   xmake config --menu
-   ```
-3. Build a static library:
-   ```sh
-   xmake build fejix_runtime
-   ```
+Currently, the only way to build Fejix is to use CMake:
+```sh
+cmake -B build
+cmake --build build
+```
+
+I would appreciate adding support for other build systems.
+If you decide to add one, do not pollute the `src` or `include` directories with build scripts. Use `tools` instead.

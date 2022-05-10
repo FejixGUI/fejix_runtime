@@ -1,0 +1,10 @@
+check_include_files("windows.h" FEJIX_HAS_WINAPI)
+check_include_files("X11/Xlib.h" FEJIX_HAS_XLIB)
+
+if(FEJIX_HAS_WINAPI)
+    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_WINAPI")
+elseif(FEJIX_HAS_XLIB)
+    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_XLIB")
+else()
+    message(FATAL_ERROR "Platform is not supported")
+endif()
