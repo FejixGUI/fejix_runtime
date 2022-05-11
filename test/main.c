@@ -11,8 +11,7 @@ uint32_t initBackend(FjBackendInitContext *ctx)
 {
     ctx->backend = FJ_BACKEND_OPENGL3;
 
-    // return fjBackendInit(ctx);
-    return FJ_OK;
+    return fjBackendInit(ctx);
 }
 
 

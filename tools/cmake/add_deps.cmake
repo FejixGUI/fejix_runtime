@@ -10,4 +10,8 @@ if(FEJIX_USE_OPENGL3)
         target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/glx.c")
         target_link_libraries(fejix_runtime "dl")
     endif()
+
+    if(FEJIX_USE_WINAPI)
+        target_link_libraries(fejix_runtime "opengl32")
+    endif()
 endif()

@@ -4,6 +4,11 @@ target_sources(fejix_runtime
     # "${SRC}/src/fejix_stdui.c"
 )
 
+target_include_directories(
+    fejix_runtime PRIVATE
+    "${SRC}/src/platform"
+)
+
 if(FEJIX_USE_WINAPI)
 
     target_sources(

@@ -52,7 +52,7 @@ struct FjWindow {
     struct FjInstance *instance;
 
     HWND hWnd;
-    // HDC hDC;
+    HDC hDC; ///< Temporary internal value
     LPWSTR encodedTitle; ///< Must be freed!
 
 #ifdef FJ_USE_OPENGL3

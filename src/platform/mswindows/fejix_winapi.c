@@ -1,6 +1,8 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/fejix_winapi.h>
 
+#include "fejix_backend_wrapper.h"
+
 #include <malloc.h>
 
 
@@ -16,7 +18,7 @@ static LRESULT CALLBACK _winProc(
 
 uint32_t fjInstanceInit(
     struct FjInstance *instance,
-    FjBackendInitializer initializer
+    FjBackendInitializer init
 )
 {
     instance->hInst = GetModuleHandle(NULL);
@@ -45,7 +47,10 @@ uint32_t fjInstanceInit(
     SetProcessDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
 #endif
 
-    return FJ_OK;
+    struct FjBackendInitContext ctx;
+    ctx.instance = instance;
+
+    return init(&ctx);
 
 }
 
@@ -89,7 +94,7 @@ uint32_t fjIntanceInitWindow(
 
     win->encodedTitle = NULL;
 
-    return FJ_OK;
+    return _fjBackendInitWindow(win);
 }
 
 
@@ -100,7 +105,9 @@ void fjWindowDestroy(struct FjWindow *win)
         win->encodedTitle = NULL;
     }
 
+    _fjBackendDestroyWindow(win);
 
+    DestroyWindow(win->hWnd);
 }
 
 
@@ -201,6 +208,23 @@ LRESULT CALLBACK _winProc(
         return 0;
     }
 #endif
+
+    case WM_PAINT: {
+
+        PAINTSTRUCT ps;
+        win->hDC = BeginPaint(hwnd, &ps);
+
+        _fjWindowBeginDrawing(win);
+
+        glClearColor(1.0f, 0.7f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT);
+
+        _fjWindowEndDrawing(win);
+
+        _fjWindowPresentDrawing(win);
+
+        return 0;
+    }
 
     default:
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
