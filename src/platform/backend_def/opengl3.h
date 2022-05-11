@@ -1,12 +1,11 @@
-#ifndef _FEJIX_X11_OPENGL3_H_
-#define _FEJIX_X11_OPENGL3_H_
+#ifndef _FEJIX_BACKEND_DEF_OPENGL3_H_
+#define _FEJIX_BACKEND_DEF_OPENGL3_H_
 
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/fejix_x11.h>
 
 uint32_t _fjBackendInit_gl3(struct FjBackendInitContext *ctx); 
 
-void _fjBackendDestroy_gl3(struct FjInstance *inst); 
+void _fjBackendDestroy_gl3(struct FjInstance *instance); 
 
 uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win); 
 
@@ -19,4 +18,4 @@ void _fjWindowEndDrawing_gl3(struct FjWindow *win);
 uint32_t _fjWindowPresentDrawing_gl3(struct FjWindow *win);
 
 
-#endif // _FEJIX_X11_OPENGL3_H_
+#endif // _FEJIX_BACKEND_DEF_OPENGL3_H_

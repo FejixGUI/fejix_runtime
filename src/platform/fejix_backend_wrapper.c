@@ -1,7 +1,7 @@
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/fejix_x11.h>
+// #include <fejix_runtime/fejix_x11.h>
 
-#include "fejix_backends.h"
+#include "fejix_backend_wrapper.h"
 
 
 uint32_t fjBackendInit(struct FjBackendInitContext *ctx)
@@ -24,13 +24,13 @@ uint32_t fjBackendInit(struct FjBackendInitContext *ctx)
 }
 
 
-void fjBackendDestroy(struct FjInstance *inst)
+void fjBackendDestroy(struct FjInstance *instance)
 {
-    switch (inst->backend)
+    switch (instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
-                _fjBackendDestroy_gl3(inst);
+                _fjBackendDestroy_gl3(instance);
 #           else                
                 return FJ_ERR_FEATURE_NOT_COMPILED;
 #           endif
@@ -41,7 +41,7 @@ void fjBackendDestroy(struct FjInstance *inst)
 
 uint32_t _fjBackendInitWindow(struct FjWindow *win)
 {
-    switch (win->inst->backend)
+    switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
@@ -57,7 +57,7 @@ uint32_t _fjBackendInitWindow(struct FjWindow *win)
 
 void _fjBackendDestroyWindow(struct FjWindow *win)
 {
-    switch (win->inst->backend)
+    switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
@@ -72,7 +72,7 @@ void _fjBackendDestroyWindow(struct FjWindow *win)
 
 uint32_t _fjWindowBeginDrawing(struct FjWindow *win)
 {
-    switch (win->inst->backend)
+    switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
@@ -89,7 +89,7 @@ uint32_t _fjWindowBeginDrawing(struct FjWindow *win)
 
 void _fjWindowEndDrawing(struct FjWindow *win)
 {
-    switch (win->inst->backend)
+    switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
@@ -104,7 +104,7 @@ void _fjWindowEndDrawing(struct FjWindow *win)
 
 uint32_t _fjWindowPresentDrawing(struct FjWindow *win)
 {
-    switch (win->inst->backend)
+    switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3

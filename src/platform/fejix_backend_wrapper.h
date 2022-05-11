@@ -3,11 +3,9 @@
 
 
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/fejix_x11.h>
-
 
 #ifdef FJ_USE_OPENGL3
-#   include "opengl3/opengl3.h"
+#   include "backend_def/opengl3.h"
 #endif
 
 uint32_t _fjBackendInitWindow(struct FjWindow *win); 

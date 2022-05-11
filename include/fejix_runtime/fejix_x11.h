@@ -44,7 +44,7 @@ struct FjInstance {
 
 struct FjWindow {
     xcb_window_t windowId;
-    struct FjInstance *inst;
+    struct FjInstance *instance;
     void *data;
 
 #ifdef FJ_USE_OPENGL3

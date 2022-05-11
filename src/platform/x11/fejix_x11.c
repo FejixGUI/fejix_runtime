@@ -36,36 +36,36 @@ static uint32_t getAtoms(
 }
 
 
-uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
+uint32_t fjInstanceInit(struct FjInstance *instance, FjBackendInitializer init)
 {
     if (init == NULL)
         return FJ_ERR_INVALID_PARAM;
         
-    inst->xDisplay = XOpenDisplay(NULL);
+    instance->xDisplay = XOpenDisplay(NULL);
 
-    if (!inst->xDisplay)
+    if (!instance->xDisplay)
         return FJ_ERR_WMAPI_FAIL;
 
-    inst->xDefaultScreen = XDefaultScreen(inst->xDisplay);
+    instance->xDefaultScreen = XDefaultScreen(instance->xDisplay);
 
-    /* inst->connection = xcb_connect(NULL, NULL);
+    /* instance->connection = xcb_connect(NULL, NULL);
 
-    if (xcb_connection_has_error(inst->connection) != 0)
+    if (xcb_connection_has_error(instance->connection) != 0)
     {
-        xcb_disconnect(inst->connection);
+        xcb_disconnect(instance->connection);
         return FJ_ERR_WMAPI_FAIL;
     } */
 
-    inst->connection = XGetXCBConnection(inst->xDisplay);
-    if (!inst->connection) {
-        XCloseDisplay(inst->xDisplay);
+    instance->connection = XGetXCBConnection(instance->xDisplay);
+    if (!instance->connection) {
+        XCloseDisplay(instance->xDisplay);
         return FJ_ERR_WMAPI_FAIL;
     }
 
-    XSetEventQueueOwner(inst->xDisplay, XCBOwnsEventQueue);
+    XSetEventQueueOwner(instance->xDisplay, XCBOwnsEventQueue);
 
-    inst->screen = xcb_setup_roots_iterator(
-        xcb_get_setup(inst->connection)
+    instance->screen = xcb_setup_roots_iterator(
+        xcb_get_setup(instance->connection)
     ).data;
 
     // Get some atoms
@@ -78,37 +78,37 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
     xcb_atom_t atoms[4];
 
-    uint32_t result = getAtoms(inst->connection, atom_names, atoms, 4);
+    uint32_t result = getAtoms(instance->connection, atom_names, atoms, 4);
     if (result != FJ_OK)
         return result;
 
-    inst->atom_NET_WM_NAME = atoms[0];
-    inst->atom_UTF8_STRING = atoms[1];
-    inst->atom_WM_DELETE_WINDOW = atoms[2];
-    inst->atom_WM_PROTOCOLS = atoms[3];
+    instance->atom_NET_WM_NAME = atoms[0];
+    instance->atom_UTF8_STRING = atoms[1];
+    instance->atom_WM_DELETE_WINDOW = atoms[2];
+    instance->atom_WM_PROTOCOLS = atoms[3];
 
     // This may be reassigned later by backend initializer
-    inst->windowVisualId = inst->screen->root_visual;
+    instance->windowVisualId = instance->screen->root_visual;
 
-    inst->colormapId = xcb_generate_id(inst->connection);
+    instance->colormapId = xcb_generate_id(instance->connection);
 
     xcb_create_colormap(
-        inst->connection,
+        instance->connection,
         XCB_COLORMAP_ALLOC_NONE,
-        inst->colormapId,
-        inst->screen->root,
-        inst->windowVisualId
+        instance->colormapId,
+        instance->screen->root,
+        instance->windowVisualId
     );
 
     // Initialize backend
 
     struct FjBackendInitContext ctx = {0};
-    ctx.instance = inst;
+    ctx.instance = instance;
 
     uint32_t status = init(&ctx);
 
     if (status != FJ_OK) {
-        fjInstanceDestroy(inst);
+        fjInstanceDestroy(instance);
         return status;
     }
 
@@ -117,59 +117,61 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
 
 
-void fjInstanceDestroy(struct FjInstance *inst)
+void fjInstanceDestroy(struct FjInstance *instance)
 {
-    fjBackendDestroy(inst);
+    fjBackendDestroy(instance);
 
-    xcb_disconnect(inst->connection);
-    // XCloseDisplay(inst->xDisplay);
+    xcb_disconnect(instance->connection);
+    // Xlib doesn't care about the opened display
+    // because it was converted to an XCB connection
+    // XCloseDisplay(instance->xDisplay);
 }
 
 
 
 uint32_t fjIntanceInitWindow(
-    struct FjInstance *inst,
+    struct FjInstance *instance,
     struct FjWindow *win,
     const struct FjWindowParams *params
 )
 {
-    win->inst = inst;
+    win->instance = instance;
 
-    win->windowId = xcb_generate_id(inst->connection);
+    win->windowId = xcb_generate_id(instance->connection);
 
     uint32_t propertiesMask = XCB_CW_BACK_PIXEL
                             | XCB_CW_EVENT_MASK
                             | XCB_CW_COLORMAP;
 
     uint32_t properties[] = {
-        inst->screen->black_pixel,
+        instance->screen->black_pixel,
         (uint32_t) 0x01FFFFFF, // Select ALL meaningful events
-        inst->colormapId
+        instance->colormapId
     };
 
     xcb_create_window(
-        inst->connection,
+        instance->connection,
         XCB_COPY_FROM_PARENT,
         win->windowId,
-        inst->screen->root,
+        instance->screen->root,
         0, 0, // X and Y, often ignored
         params->width, params->height,
         0, // border width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
-        inst->windowVisualId,
+        instance->windowVisualId,
         propertiesMask,
         properties
     );
 
     xcb_change_property(
-        inst->connection,
+        instance->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
-        inst->atom_WM_PROTOCOLS,
+        instance->atom_WM_PROTOCOLS,
         XCB_ATOM_ATOM,
         sizeof(xcb_atom_t) * 8,
         1,
-        &inst->atom_WM_DELETE_WINDOW
+        &instance->atom_WM_DELETE_WINDOW
     );
 
     // fjWindowSetShown(win, 1);
@@ -182,7 +184,7 @@ uint32_t fjIntanceInitWindow(
 void fjWindowDestroy(struct FjWindow *win)
 {
     _fjBackendDestroyWindow(win);
-    xcb_destroy_window(win->inst->connection, win->windowId);
+    xcb_destroy_window(win->instance->connection, win->windowId);
 }
 
 
@@ -190,29 +192,29 @@ void fjWindowDestroy(struct FjWindow *win)
 void fjWindowSetShown(struct FjWindow *win, uint32_t shown)
 {
     if (shown)
-        xcb_map_window(win->inst->connection, win->windowId);
+        xcb_map_window(win->instance->connection, win->windowId);
     else
-        xcb_unmap_window(win->inst->connection, win->windowId);
+        xcb_unmap_window(win->instance->connection, win->windowId);
 
 
-    xcb_flush(win->inst->connection);
+    xcb_flush(win->instance->connection);
 }
 
 
 uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
 {
     xcb_change_property(
-        win->inst->connection,
+        win->instance->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
-        win->inst->atom_NET_WM_NAME,
-        win->inst->atom_UTF8_STRING,
+        win->instance->atom_NET_WM_NAME,
+        win->instance->atom_UTF8_STRING,
         sizeof(*title) * 8,
         strlen(title),
         title
     );
 
-    xcb_flush(win->inst->connection);
+    xcb_flush(win->instance->connection);
 
     return FJ_OK;
 }
@@ -235,7 +237,7 @@ static struct FjWindow* findWindowById(
 
 
 void fjLoop(
-    struct FjInstance *inst,
+    struct FjInstance *instance,
     FjEventHandler handle,
     struct FjWindow **windows,
     uint32_t length
@@ -243,7 +245,7 @@ void fjLoop(
 {
     for (;;)
     {
-        xcb_generic_event_t *event = xcb_wait_for_event(inst->connection);
+        xcb_generic_event_t *event = xcb_wait_for_event(instance->connection);
 
         if (event == NULL)
             return;
@@ -275,7 +277,7 @@ void fjLoop(
                 win = findWindowById(windows, length, client_event->window);
                 if (!win) break;
 
-                if (client_event->data.data32[0] == inst->atom_WM_DELETE_WINDOW)
+                if (client_event->data.data32[0] == instance->atom_WM_DELETE_WINDOW)
                 {
                     ev.eventType = FJ_EVENT_CLOSE;
                     canHandle = 1;
