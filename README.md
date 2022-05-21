@@ -14,6 +14,8 @@ This library is supposed to handle:
 - global UI events (key presses, DPI changes)
 - localising cursor movement and clicks to specific widgets
 
+Allocation of windows and widgets is not handled by Fejix runtime. 
+
 ## Build
 
 1. Install Xmake [like this](https://xmake.io/#/getting_started?id=installation).

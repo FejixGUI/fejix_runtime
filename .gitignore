@@ -1,4 +1,6 @@
 .xmake
 .vscode
+.junk
+.plan
 build
 target
