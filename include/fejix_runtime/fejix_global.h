@@ -15,6 +15,13 @@
 #define FJ_ERR_MALLOC_FAIL      1
 #define FJ_ERR_WMAPI_FAIL       2
 #define FJ_ERR_BK_FAIL          3
+#define FJ_ERR_UNKNOWN_PARAM    4
+#define FJ_ERR_UNKNOWN_BK       5
+#define FJ_ERR_BK_NOT_COMPILED  6
+
+// Parameters for backend initialization
+#define FJ_PARAM_END            0
+#define FJ_PARAM_INIT_BK        1
 
 // Backend identifiers
 #define FJ_BK_NONE      0
@@ -30,6 +37,16 @@
     + FJ_BK_HAS_CAIRO       \
     + FJ_BK_HAS_OPENGL3     \
 )
+
+
+
+// Backend- and WmApi-specific configuration
+// #ifdef FJ_WMAPI_SDL
+// #   if FJ_BK_HAS_CAIRO
+// #       define FJ_WMAPI_SDL_NEEDS_BACK_BUFFER
+// #   endif
+// #endif // FJ_WMAPI_SDL
+
 
 
 // Include backends

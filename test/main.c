@@ -8,29 +8,26 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/fejix_aliases.h>
 
+
+const uint32_t params[] = {
+    FJ_PARAM_INIT_BK, FJ_BK_CAIRO,
+    FJ_PARAM_END,
+};
+
+
 int main() {
     assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
 
-    SDL_Window *win = SDL_CreateWindow(
+    SDL_Window *window = SDL_CreateWindow(
         "Hello world!",
         SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
         800, 600,
         0 //SDL_WINDOW_RESIZABLE
     );
+    assert(window);
 
-    assert(win);
-
-    SDL_Renderer *rend = SDL_CreateRenderer(win, -1, 0);
-
-    assert(win);
-
-    printf("SDL initialized successfully\n");
-
-    uint32_t status;
-    
     FjRoot root = {0};
-    status = fjRootInit_Sdl(&root, rend);
-    printf("Init root: %d\n", status);
+    assert(fjRootInit_Sdl(&root, params, window) == FJ_OK);
 
     fjRootSetColor(&root, 1., .7, .0, 1.);
 
@@ -45,14 +42,12 @@ int main() {
 
         }
 
-        fjDraw_Sdl(&root, rend);
-        SDL_RenderPresent(rend);
+        assert(fjDraw(&root) == FJ_OK);
     }
 
-    fjRootDestroy_Sdl(&root);
+    fjRootDestroy(&root);
 
-    SDL_DestroyRenderer(rend);
-    SDL_DestroyWindow(win);
+    SDL_DestroyWindow(window);
 
     SDL_Quit();
 

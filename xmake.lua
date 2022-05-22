@@ -3,6 +3,8 @@ add_requires("libsdl", "cairo")
 target("fejix_runtime")
     set_kind("static")
     add_includedirs("include", {public = true})
+
+    -- TODO Manage multiple platform-specific files
     add_files("src/*.c")
 
     -- Only for development!

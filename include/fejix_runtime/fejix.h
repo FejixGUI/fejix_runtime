@@ -50,9 +50,8 @@ struct FjRoot {
 
     struct FjWidget *rootWidget;
 
-    uint32_t *paramList;
-
 #ifdef FJ_WMAPI_SDL
+    SDL_Renderer *_sdlRenderer;
     SDL_Texture *_sdlTexture; // Back buffer
 #endif
 
@@ -62,14 +61,18 @@ struct FjRoot {
 #endif
 };
 
-void fjRootSetColor(struct FjRoot *root, float R, float G, float B, float A);
+
 
 #ifdef FJ_WMAPI_SDL
-    uint32_t fjRootInit_Sdl(struct FjRoot *root, SDL_Renderer *renderer);
-    void fjRootDestroy_Sdl(struct FjRoot *root);
-
-    uint32_t fjDraw_Sdl(struct FjRoot *root, SDL_Renderer *renderer);
+    uint32_t fjRootInit_Sdl(
+        struct FjRoot *root,
+        const uint32_t *parameters,
+        SDL_Window *window
+    );
 #endif
+void fjRootDestroy(struct FjRoot *root);
+void fjRootSetColor(struct FjRoot *root, float R, float G, float B, float A);
 
+uint32_t fjDraw(struct FjRoot *root);
 
 #endif // _FEJIX_H_
