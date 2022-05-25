@@ -6,10 +6,10 @@
 
 #ifdef _FEJIX_H_
     _ALIAS(FjBox)
-    _ALIAS(FjRect)
+    _ALIAS(FjGeometry)
     _ALIAS(FjWidget)
     _ALIAS(FjRoot)
-    _ALIAS(FjSimpleColor)
+    _ALIAS(FjColor)
 #endif
 
 #undef _ALIAS

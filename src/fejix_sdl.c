@@ -12,6 +12,8 @@ static uint32_t _fjInitCairo(struct FjRoot *root, SDL_Window *win)
 
     int width, height;
     SDL_GetRendererOutputSize(root->_sdlRenderer, &width, &height);
+    root->size.x = width;
+    root->size.y = height;
 
     root->_sdlTexture = SDL_CreateTexture(
         root->_sdlRenderer,
