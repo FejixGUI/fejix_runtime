@@ -1,4 +1,5 @@
 #include <fejix_runtime/fejix_xcb.h>
+#include <fejix_runtime/fejix.h>
 
 #include <string.h>
 #include <malloc.h>
@@ -109,7 +110,9 @@ uint32_t fjWindowInit(
     uint32_t propertiesMask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t properties[] = {
         inst->screen->black_pixel,
-        ((uint32_t) 0x01FFFFFF) // Select ALL meaningful events
+        // Select ALL meaningful events
+        ((uint32_t) 0x01FFFFFF ^ XCB_EVENT_MASK_NO_EVENT)
+        // XCB_EVENT_MASK_EXPOSURE
     };
 
     xcb_create_window(
@@ -124,17 +127,6 @@ uint32_t fjWindowInit(
         inst->screen->root_visual,
         propertiesMask,
         properties
-    );
-
-    xcb_change_property(
-        inst->connection,
-        XCB_PROP_MODE_REPLACE,
-        win->windowId,
-        inst->atom_WM_PROTOCOLS,
-        XCB_ATOM_ATOM,
-        32,
-        1,
-        &inst->atom_WM_DELETE_WINDOW
     );
 
     win->inst = inst;
@@ -170,7 +162,7 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
         win->windowId,
         win->inst->atom_NET_WM_NAME,
         win->inst->atom_UTF8_STRING,
-        8, // 8-bit characters
+        sizeof(char) * 8,
         strlen(title),
         (const void *) title
     );
@@ -181,29 +173,82 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
 }
 
 
+/// Returns: pointer to the window from the list that has the specified ID.
+// If such a window was not found, returns NULL
+static struct FjWindow* findWindowById(
+    struct FjWindow **windows,
+    int length,
+    xcb_window_t id
+)
+{
+    for (int i=0; i<length; i++)
+        if (windows[i]->windowId == id)
+            return windows[i];
+
+    return NULL;
+}
+
+
 void fjLoop(
     struct FjInstance *inst,
+    FjEventHandler handle,
     struct FjWindow **windows,
     uint32_t length
 )
 {
-    xcb_generic_event_t *event;
-
-    while ((event = xcb_wait_for_event(inst->connection)))
+    for (;;)
     {
+        xcb_generic_event_t *event = xcb_wait_for_event(inst->connection);
+
+        if (event == NULL)
+            return;
+
+        struct FjWindow *win;
+        struct FjEvent ev;
+        int canHandle = 0;
+
         switch (event->response_type)
         {
-                        case XCB_CLIENT_MESSAGE:
+            case XCB_EXPOSE:
+                xcb_change_property(
+                    inst->connection,
+                    XCB_PROP_MODE_REPLACE,
+                    win->windowId,
+                    inst->atom_WM_PROTOCOLS,
+                    XCB_ATOM_ATOM,
+                    sizeof(xcb_atom_t) * 8,
+                    1,
+                    &inst->atom_WM_DELETE_WINDOW
+                );
+            break;
+
+            case XCB_CLIENT_MESSAGE:
             {
                 xcb_client_message_event_t *client_event;
                 client_event = (xcb_client_message_event_t *) event;
 
+                win = findWindowById(windows, length, client_event->window);
+                if (!win) break;
+
                 if (client_event->data.data32[0] == inst->atom_WM_DELETE_WINDOW)
-                    return;
+                {
+                    ev.eventType = FJ_EVENT_CLOSE;
+                    canHandle = 1;
+                }
+
             }
             break;
 
             default: break;
+        }
+
+        free(event);
+
+        if (canHandle) {
+            uint32_t response = handle(win, &ev);
+
+            if (response == FJ_EXIT)
+                return;
         }
     }
 }

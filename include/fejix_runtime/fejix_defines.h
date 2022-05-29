@@ -19,6 +19,12 @@
 #define FJ_ERR_UNKNOWN_BACKEND  5
 #define FJ_ERR_BACKEND_ABSENT   6
 
+// Responses of event handlers
+#define FJ_EXIT                 1
+
+// Events
+#define FJ_EVENT_CLOSE          1
+
 
 #define FJ_PARAM_MAX            1024
 

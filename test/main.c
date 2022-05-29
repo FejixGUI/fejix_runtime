@@ -16,6 +16,21 @@ const int32_t win_params[] = {
 };
 
 
+uint32_t handleEvent(struct FjWindow *win, struct FjEvent *ev)
+{
+    switch (ev->eventType)
+    {
+        case FJ_EVENT_CLOSE:
+            puts("Window being closed");
+            fjWindowSetShown(win, 0);
+            return FJ_EXIT;
+        break;
+    }
+
+    return FJ_OK;
+}
+
+
 int main() {
     struct FjInstance inst;
     assert(fjInstanceInit(&inst, inst_params) == FJ_OK);
@@ -28,7 +43,7 @@ int main() {
     fjWindowSetShown(&win, 1);
 
     struct FjWindow *windows[] = { &win };
-    fjLoop(&inst, windows, 1);
+    fjLoop(&inst, &handleEvent, windows, 1);
 
     fjWindowDestroy(&win);
 

@@ -11,6 +11,14 @@
 #endif
 
 
+struct FjEvent {
+    uint32_t eventType;
+    
+    union {
+        
+    };
+};
+
 
 uint32_t fjInstanceInit(struct FjInstance *inst, const int32_t *params);
 void fjInstanceDestroy(struct FjInstance *inst);
@@ -25,8 +33,11 @@ void fjWindowDestroy(struct FjWindow *win);
 void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown);
 uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title);
 
+typedef uint32_t (*FjEventHandler)(struct FjWindow *win, struct FjEvent *ev);
+
 void fjLoop(
     struct FjInstance *inst,
+    FjEventHandler handler,
     struct FjWindow **windows,
     uint32_t length
 );

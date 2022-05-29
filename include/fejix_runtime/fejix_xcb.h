@@ -20,8 +20,9 @@ struct FjInstance {
 
 
 struct FjWindow {
-    struct FjInstance *inst;
     xcb_window_t windowId;
+    struct FjInstance *inst;
+    void *data;
 };
 
 
