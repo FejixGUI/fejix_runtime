@@ -51,17 +51,21 @@ uint32_t fjInstanceInit(struct FjInstance *inst, const int32_t *params)
     // Get some atoms
     const char *atom_names[] = {
         "_NET_WM_NAME",
-        "UTF8_STRING"
+        "UTF8_STRING",
+        "WM_DELETE_WINDOW",
+        "WM_PROTOCOLS"
     };
 
-    xcb_atom_t atoms[2];
+    xcb_atom_t atoms[4];
 
-    uint32_t result = _getAtoms(inst->connection, atom_names, atoms, 2);
+    uint32_t result = _getAtoms(inst->connection, atom_names, atoms, 4);
     if (result != FJ_OK)
         return result;
 
     inst->atom_NET_WM_NAME = atoms[0];
     inst->atom_UTF8_STRING = atoms[1];
+    inst->atom_WM_DELETE_WINDOW = atoms[2];
+    inst->atom_WM_PROTOCOLS = atoms[3];
 
     return FJ_OK;
 }
@@ -100,22 +104,38 @@ uint32_t fjWindowInit(
         }
     }
 
-    win->window_id = xcb_generate_id(inst->connection);
+    win->windowId = xcb_generate_id(inst->connection);
+
+    uint32_t propertiesMask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t properties[] = {
+        inst->screen->black_pixel,
+        ((uint32_t) 0x01FFFFFF) // Select ALL meaningful events
+    };
 
     xcb_create_window(
         inst->connection,
         XCB_COPY_FROM_PARENT,
-        win->window_id,
+        win->windowId,
         inst->screen->root,
-        0, 0,
+        0, 0, // X and Y, often ignored
         width, height,
-        0, // border width,
+        0, // border width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
         inst->screen->root_visual,
-        0, NULL // masks
+        propertiesMask,
+        properties
     );
 
-    
+    xcb_change_property(
+        inst->connection,
+        XCB_PROP_MODE_REPLACE,
+        win->windowId,
+        inst->atom_WM_PROTOCOLS,
+        XCB_ATOM_ATOM,
+        32,
+        1,
+        &inst->atom_WM_DELETE_WINDOW
+    );
 
     win->inst = inst;
 
@@ -126,7 +146,7 @@ uint32_t fjWindowInit(
 
 void fjWindowDestroy(struct FjWindow *win)
 {
-    xcb_destroy_window(win->inst->connection, win->window_id);
+    xcb_destroy_window(win->inst->connection, win->windowId);
 }
 
 
@@ -134,9 +154,9 @@ void fjWindowDestroy(struct FjWindow *win)
 void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown)
 {
     if (is_shown)
-        xcb_map_window(win->inst->connection, win->window_id);
+        xcb_map_window(win->inst->connection, win->windowId);
     else
-        xcb_unmap_window(win->inst->connection, win->window_id);
+        xcb_unmap_window(win->inst->connection, win->windowId);
 
     xcb_flush(win->inst->connection);
 }
@@ -147,7 +167,7 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
     xcb_change_property(
         win->inst->connection,
         XCB_PROP_MODE_REPLACE,
-        win->window_id,
+        win->windowId,
         win->inst->atom_NET_WM_NAME,
         win->inst->atom_UTF8_STRING,
         8, // 8-bit characters
@@ -155,5 +175,35 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
         (const void *) title
     );
 
+    xcb_flush(win->inst->connection);
+
     return FJ_OK;
+}
+
+
+void fjLoop(
+    struct FjInstance *inst,
+    struct FjWindow **windows,
+    uint32_t length
+)
+{
+    xcb_generic_event_t *event;
+
+    while ((event = xcb_wait_for_event(inst->connection)))
+    {
+        switch (event->response_type)
+        {
+                        case XCB_CLIENT_MESSAGE:
+            {
+                xcb_client_message_event_t *client_event;
+                client_event = (xcb_client_message_event_t *) event;
+
+                if (client_event->data.data32[0] == inst->atom_WM_DELETE_WINDOW)
+                    return;
+            }
+            break;
+
+            default: break;
+        }
+    }
 }

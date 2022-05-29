@@ -11,14 +11,17 @@
 struct FjInstance {
     xcb_connection_t *connection;
     xcb_screen_t *screen;
-    xcb_atom_t atom_NET_WM_NAME;
-    xcb_atom_t atom_UTF8_STRING;
+    xcb_atom_t 
+        atom_NET_WM_NAME,
+        atom_UTF8_STRING,
+        atom_WM_DELETE_WINDOW,
+        atom_WM_PROTOCOLS;
 };
 
 
 struct FjWindow {
     struct FjInstance *inst;
-    xcb_window_t window_id;
+    xcb_window_t windowId;
 };
 
 

@@ -25,5 +25,11 @@ void fjWindowDestroy(struct FjWindow *win);
 void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown);
 uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title);
 
+void fjLoop(
+    struct FjInstance *inst,
+    struct FjWindow **windows,
+    uint32_t length
+);
+
 
 #endif // _FEJIX_H_

@@ -1,10 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
-#include <unistd.h>
 
 #include <fejix_runtime/fejix.h>
-
 
 const int32_t inst_params[] = {
     FJ_IPARAM_END
@@ -25,11 +23,12 @@ int main() {
     struct FjWindow win;
     assert(fjWindowInit(&inst, &win, win_params) == FJ_OK);
 
-    fjWindowSetTitle(&win, "Это работает!");
+    assert(fjWindowSetTitle(&win, "Это работает!") == FJ_OK);
 
     fjWindowSetShown(&win, 1);
 
-    usleep(3 * 1000000);
+    struct FjWindow *windows[] = { &win };
+    fjLoop(&inst, windows, 1);
 
     fjWindowDestroy(&win);
 
