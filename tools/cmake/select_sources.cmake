@@ -1,21 +1,21 @@
 target_sources(fejix_runtime
     PRIVATE
-    "${SRC}/fejix_generic.c"
-    "${SRC}/fejix_stdui.c"
+    "${SRC}/src/fejix_generic.c"
+    # "${SRC}/src/fejix_stdui.c"
 )
 
 if(FEJIX_HAS_WINAPI)
 
     target_sources(
         fejix_runtime PRIVATE
-        "${SRC}/platform/winapi/fejix_winapi.c"
+        "${SRC}/src/platform/mswindows/fejix_winapi.c"
     )
 
-elseif(FEJIX_HAS_XLIB)
+elseif(FEJIX_HAS_XCB)
 
     target_sources(
         fejix_runtime PRIVATE
-        "${SRC}/platform/xlib/fejix_xlib.c"
+        "${SRC}/src/platform/x11/fejix_xcb.c"
     )
 
 endif()
