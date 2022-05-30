@@ -21,7 +21,7 @@ uint32_t handleEvent(struct FjWindow *win, struct FjEvent *ev)
     switch (ev->eventType)
     {
         case FJ_EVENT_CLOSE:
-            puts("Window being closed");
+            puts("Did you just close the window?");
             fjWindowSetShown(win, 0);
             return FJ_EXIT;
         break;
@@ -38,7 +38,7 @@ int main() {
     struct FjWindow win;
     assert(fjWindowInit(&inst, &win, win_params) == FJ_OK);
 
-    assert(fjWindowSetTitle(&win, "Это работает!") == FJ_OK);
+    assert(fjWindowSetTitle(&win, "Це працює!") == FJ_OK);
 
     fjWindowSetShown(&win, 1);
 

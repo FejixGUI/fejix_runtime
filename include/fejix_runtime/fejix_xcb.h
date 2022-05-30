@@ -7,6 +7,10 @@
 #include <xcb/xcb.h>
 
 
+// Why isn't it included in XCB???
+// It was so annoying to figure this out!
+#define FJ_XCB_EVENT_MASK (~0x80)
+
 
 struct FjInstance {
     xcb_connection_t *connection;

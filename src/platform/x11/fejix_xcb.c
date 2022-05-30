@@ -4,7 +4,6 @@
 #include <string.h>
 #include <malloc.h>
 
-
 static uint32_t _getAtoms(
     xcb_connection_t *con,
     const char **names,
@@ -111,7 +110,7 @@ uint32_t fjWindowInit(
     uint32_t properties[] = {
         inst->screen->black_pixel,
         // Select ALL meaningful events
-        ((uint32_t) 0x01FFFFFF ^ XCB_EVENT_MASK_NO_EVENT)
+        ((uint32_t) 0x01FFFFFF /* ^ XCB_EVENT_MASK_NO_EVENT */)
         // XCB_EVENT_MASK_EXPOSURE
     };
 
@@ -127,6 +126,17 @@ uint32_t fjWindowInit(
         inst->screen->root_visual,
         propertiesMask,
         properties
+    );
+
+    xcb_change_property(
+        inst->connection,
+        XCB_PROP_MODE_REPLACE,
+        win->windowId,
+        inst->atom_WM_PROTOCOLS,
+        XCB_ATOM_ATOM,
+        sizeof(xcb_atom_t) * 8,
+        1,
+        &inst->atom_WM_DELETE_WINDOW
     );
 
     win->inst = inst;
@@ -203,23 +213,14 @@ void fjLoop(
         if (event == NULL)
             return;
 
-        struct FjWindow *win;
+        struct FjWindow *win = NULL;
         struct FjEvent ev;
         int canHandle = 0;
 
-        switch (event->response_type)
+        switch (event->response_type & FJ_XCB_EVENT_MASK) 
         {
             case XCB_EXPOSE:
-                xcb_change_property(
-                    inst->connection,
-                    XCB_PROP_MODE_REPLACE,
-                    win->windowId,
-                    inst->atom_WM_PROTOCOLS,
-                    XCB_ATOM_ATOM,
-                    sizeof(xcb_atom_t) * 8,
-                    1,
-                    &inst->atom_WM_DELETE_WINDOW
-                );
+                
             break;
 
             case XCB_CLIENT_MESSAGE:
@@ -244,7 +245,7 @@ void fjLoop(
 
         free(event);
 
-        if (canHandle) {
+        if (canHandle && win != NULL) {
             uint32_t response = handle(win, &ev);
 
             if (response == FJ_EXIT)
