@@ -14,9 +14,9 @@
 struct FjEvent {
     uint32_t eventType;
     
-    union {
-        
-    };
+    /* union {
+
+    }; */
 };
 
 

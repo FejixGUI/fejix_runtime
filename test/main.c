@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <assert.h>
 
 #include <fejix_runtime/fejix.h>
+#include "myassert.h"
 
 const int32_t inst_params[] = {
     FJ_IPARAM_END
@@ -30,16 +30,17 @@ uint32_t handleEvent(struct FjWindow *win, struct FjEvent *ev)
     return FJ_OK;
 }
 
+struct FjInstance inst = {0};
+struct FjWindow win = {0};
 
 int main() {
-    struct FjInstance inst;
-    assert(fjInstanceInit(&inst, inst_params) == FJ_OK);
+    massert(fjInstanceInit(&inst, inst_params) == FJ_OK);
 
-    struct FjWindow win;
-    assert(fjWindowInit(&inst, &win, win_params) == FJ_OK);
+    massert(fjWindowInit(&inst, &win, win_params) == FJ_OK);
 
-    assert(fjWindowSetTitle(&win, "Це працює!") == FJ_OK);
+    massert(fjWindowSetTitle(&win, "Це працює!") == FJ_OK);
 
+    win.inst = &inst;
     fjWindowSetShown(&win, 1);
 
     struct FjWindow *windows[] = { &win };

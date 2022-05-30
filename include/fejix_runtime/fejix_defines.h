@@ -18,6 +18,7 @@
 #define FJ_ERR_UNKNOWN_PARAM    4
 #define FJ_ERR_UNKNOWN_BACKEND  5
 #define FJ_ERR_BACKEND_ABSENT   6
+#define FJ_ERR_INVALID_PARAM    7
 
 // Responses of event handlers
 #define FJ_EXIT                 1

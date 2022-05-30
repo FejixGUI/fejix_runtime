@@ -104,6 +104,8 @@ uint32_t fjWindowInit(
         }
     }
 
+    win->inst = inst;
+
     win->windowId = xcb_generate_id(inst->connection);
 
     uint32_t propertiesMask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
@@ -128,18 +130,20 @@ uint32_t fjWindowInit(
         properties
     );
 
+    xcb_atom_t wmProtocols[] = {
+        inst->atom_WM_DELETE_WINDOW
+    };
+
     xcb_change_property(
         inst->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
         inst->atom_WM_PROTOCOLS,
         XCB_ATOM_ATOM,
-        sizeof(xcb_atom_t) * 8,
+        sizeof(*wmProtocols) * 8,
         1,
-        &inst->atom_WM_DELETE_WINDOW
+        wmProtocols
     );
-
-    win->inst = inst;
 
     return FJ_OK;
 }
@@ -160,21 +164,25 @@ void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown)
     else
         xcb_unmap_window(win->inst->connection, win->windowId);
 
+
     xcb_flush(win->inst->connection);
 }
 
 
 uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
 {
+    if (!win || !win->inst)
+        return FJ_ERR_INVALID_PARAM;
+
     xcb_change_property(
         win->inst->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
         win->inst->atom_NET_WM_NAME,
         win->inst->atom_UTF8_STRING,
-        sizeof(char) * 8,
+        sizeof(*title) * 8,
         strlen(title),
-        (const void *) title
+        title
     );
 
     xcb_flush(win->inst->connection);
