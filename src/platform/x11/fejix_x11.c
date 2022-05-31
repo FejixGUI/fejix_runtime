@@ -1,10 +1,10 @@
-#include <fejix_runtime/fejix_xcb.h>
+#include <fejix_runtime/fejix_x11.h>
 #include <fejix_runtime/fejix.h>
 
 #include <string.h>
 #include <malloc.h>
 
-static uint32_t _getAtoms(
+static uint32_t getAtoms(
     xcb_connection_t *con,
     const char **names,
     xcb_atom_t *atoms,
@@ -34,19 +34,25 @@ static uint32_t _getAtoms(
 }
 
 
-uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init)
+uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 {
     if (init == NULL)
         return FJ_ERR_INVALID_PARAM;
         
+    inst->xdisplay = XOpenDisplay(NULL);
 
-    inst->connection = xcb_connect(NULL, NULL);
+    if (!inst->xdisplay)
+        return FJ_ERR_WMAPI_FAIL;
 
-    if (xcb_connection_has_error(inst->connection) != 0)
+    // inst->connection = xcb_connect(NULL, NULL);
+
+    /* if (xcb_connection_has_error(inst->connection) != 0)
     {
         xcb_disconnect(inst->connection);
         return FJ_ERR_WMAPI_FAIL;
-    }
+    } */
+
+    inst->connection = XGetXCBConnection(inst->xdisplay);
 
     inst->screen = xcb_setup_roots_iterator(
         xcb_get_setup(inst->connection)
@@ -62,7 +68,7 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init)
 
     xcb_atom_t atoms[4];
 
-    uint32_t result = _getAtoms(inst->connection, atom_names, atoms, 4);
+    uint32_t result = getAtoms(inst->connection, atom_names, atoms, 4);
     if (result != FJ_OK)
         return result;
 
@@ -73,7 +79,7 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init)
 
     // Initialize backend
 
-    struct FjInstanceInitContext ctx = {0};
+    struct FjBackendInitContext ctx = {0};
     ctx.instance = inst;
 
     uint32_t status = init(&ctx);
@@ -90,7 +96,8 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init)
 
 void fjInstanceDestroy(struct FjInstance *inst)
 {
-    xcb_disconnect(inst->connection);
+    // xcb_disconnect(inst->connection);
+    XCloseDisplay(inst->xdisplay);
 }
 
 
@@ -149,9 +156,9 @@ void fjWindowDestroy(struct FjWindow *win)
 
 
 
-void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown)
+void fjWindowSetShown(struct FjWindow *win, uint32_t shown)
 {
-    if (is_shown)
+    if (shown)
         xcb_map_window(win->inst->connection, win->windowId);
     else
         xcb_unmap_window(win->inst->connection, win->windowId);

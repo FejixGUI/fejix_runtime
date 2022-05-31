@@ -4,7 +4,7 @@
 
 #include <fejix_runtime/fejix_defines.h>
 
-#include <xcb/xcb.h>
+#include <X11/Xlib-xcb.h>
 
 #ifdef FJ_USE_OPENGL
 #   include <glad/glad_glx.h>
@@ -17,6 +17,10 @@
 
 
 struct FjInstance {
+    // Xlib stuff
+    Display *xdisplay;
+
+    // Xcb things
     xcb_connection_t *connection;
     xcb_screen_t *screen;
     xcb_atom_t 

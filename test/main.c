@@ -7,7 +7,7 @@
 #include "myassert.h"
 
 
-uint32_t initInstance(FjInstanceInitContext *ctx)
+uint32_t initInstance(FjBackendInitContext *ctx)
 {
     return FJ_OK;
 }

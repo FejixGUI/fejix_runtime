@@ -16,6 +16,7 @@
 #define FJ_ERR_WMAPI_FAIL           2
 #define FJ_ERR_BACKEND_FAIL         3
 #define FJ_ERR_INVALID_PARAM        4
+#define FJ_ERR_INVALID_ENCODING     5
 
 // Responses of event handlers
 #define FJ_EXIT                 1
