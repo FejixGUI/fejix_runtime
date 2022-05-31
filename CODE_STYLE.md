@@ -7,11 +7,11 @@
 ## Naming
 | Style | For |
 | --- | --- |
-| `fjPascalCase` | Functions |
+| `fjCamelCase` | Functions |
 | `FjPascalCase` | Types |
 | `FJ_SCREAMING_SNAKE_CASE` | Macros and enum members |
 | `_FJ_HEADER_NAME_H_` | Header guards |
-| `_whatever` | Private/local things that nobody needs to see |
+| `FJ_USE_XXX` | If defined, means that XXX is available |
 
 ## Line width
 Please, do not exceed 80 columns.
@@ -29,7 +29,7 @@ struct SomeStruct {
 
 };
 ```
-And put a typedef into [fejix_aliases.h](include/fejix_runtime/fejix_aliases.h):
+And put a typedef into [fejix_helper.h](include/fejix_runtime/fejix_helper.h):
 ```c
 _ALIAS(SomeStruct)
 ```
@@ -60,7 +60,7 @@ struct B {
 ```
 
 ## Header files path
-All Fejix headers should be accessed through
+All Fejix public headers should be accessed through
 the [fejix_runtime directory](include/fejix_runtime):
 ```c
 #include <fejix_runtime/fejix.h> // <- Yes
@@ -68,21 +68,12 @@ the [fejix_runtime directory](include/fejix_runtime):
 ```
 Perhaps, user code might not do the same way, however the library's code should.
 
+Private headers can be located anywhere.
+
 ## Numeric types
 Always use the integral types from `<stdint.h>` in public interfaces (fields of
 structures, argument types, etc.). Private things like `for` loop counters
 may be given types at your discretion.
-
-## Abbreviation
-The are a few allowed words which you can shorten:
-
-| Abbreviation | Full |
-| --- | --- |
-| V | Version |
-| Bk | Backend |
-| Fj | Fejix |
-| Wm | Window manager/management |
-| Init | Initialize |
 
 Normally only the first letter of abbreviations are capitalized:
 Html, Php, Http.

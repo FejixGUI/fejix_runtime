@@ -1,22 +1,19 @@
+#include <fejix_runtime/fejix.h>
+#include <fejix_runtime/fejix_helper.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <fejix_runtime/fejix.h>
 #include "myassert.h"
 
-const int32_t inst_params[] = {
-    FJ_IPARAM_END
-};
+
+uint32_t initInstance(FjInstanceInitContext *ctx)
+{
+    return FJ_OK;
+}
 
 
-const int32_t win_params[] = {
-    FJ_WPARAM_WIDTH, 800,
-    FJ_WPARAM_HEIGHT, 600,
-    FJ_WPARAM_END
-};
-
-
-uint32_t handleEvent(struct FjWindow *win, struct FjEvent *ev)
+uint32_t handleEvent(FjWindow *win, FjEvent *ev)
 {
     switch (ev->eventType)
     {
@@ -30,20 +27,26 @@ uint32_t handleEvent(struct FjWindow *win, struct FjEvent *ev)
     return FJ_OK;
 }
 
-struct FjInstance inst = {0};
-struct FjWindow win = {0};
 
 int main() {
-    massert(fjInstanceInit(&inst, inst_params) == FJ_OK);
+    
+    FjInstance inst = {0};
+    FjWindow win = {0};
 
-    massert(fjWindowInit(&inst, &win, win_params) == FJ_OK);
+    massert(fjInstanceInit(&inst, &initInstance) == FJ_OK);
+
+    FjWindowParams wparams = {
+        .width = 800,
+        .height = 600
+    };
+
+    massert(fjIntanceInitWindow(&inst, &win, &wparams) == FJ_OK);
 
     massert(fjWindowSetTitle(&win, "Це працює!") == FJ_OK);
 
-    win.inst = &inst;
     fjWindowSetShown(&win, 1);
 
-    struct FjWindow *windows[] = { &win };
+    FjWindow *windows[] = { &win };
     fjLoop(&inst, &handleEvent, windows, 1);
 
     fjWindowDestroy(&win);

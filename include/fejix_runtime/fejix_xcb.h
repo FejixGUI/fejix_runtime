@@ -6,6 +6,10 @@
 
 #include <xcb/xcb.h>
 
+#ifdef FJ_USE_OPENGL
+#   include <glad/glad_glx.h>
+#endif
+
 
 // Why isn't it included in XCB???
 // It was so annoying to figure this out!

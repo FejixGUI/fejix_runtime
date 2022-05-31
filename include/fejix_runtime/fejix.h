@@ -6,8 +6,12 @@
 
 #ifdef FJ_USE_WINAPI
 #   include <fejix_runtime/fejix_winapi.h>
-#elif FJ_USE_XCB
+#elif FJ_USE_X11
 #   include <fejix_runtime/fejix_xcb.h>
+#endif
+
+#ifdef FJ_USE_OPENGL
+#   include <glad/glad.h>
 #endif
 
 
@@ -20,13 +24,31 @@ struct FjEvent {
 };
 
 
-uint32_t fjInstanceInit(struct FjInstance *inst, const int32_t *params);
+struct FjWindowParams {
+    uint32_t width;
+    uint32_t height;
+
+    // unsigned resizable: 1;
+};
+
+
+struct FjInstanceInitContext {
+    struct FjInstance *instance;
+    uint32_t backend;
+};
+
+typedef uint32_t (*FjInstanceInitializer) (
+    struct FjInstanceInitContext *initCtx
+);
+
+
+uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init);
 void fjInstanceDestroy(struct FjInstance *inst);
 
-uint32_t fjWindowInit(
+uint32_t fjIntanceInitWindow(
     struct FjInstance *inst,
     struct FjWindow *win,
-    const int32_t *params
+    const struct FjWindowParams *params
 );
 void fjWindowDestroy(struct FjWindow *win);
 

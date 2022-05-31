@@ -34,8 +34,12 @@ static uint32_t _getAtoms(
 }
 
 
-uint32_t fjInstanceInit(struct FjInstance *inst, const int32_t *params)
+uint32_t fjInstanceInit(struct FjInstance *inst, FjInstanceInitializer init)
 {
+    if (init == NULL)
+        return FJ_ERR_INVALID_PARAM;
+        
+
     inst->connection = xcb_connect(NULL, NULL);
 
     if (xcb_connection_has_error(inst->connection) != 0)
@@ -67,6 +71,18 @@ uint32_t fjInstanceInit(struct FjInstance *inst, const int32_t *params)
     inst->atom_WM_DELETE_WINDOW = atoms[2];
     inst->atom_WM_PROTOCOLS = atoms[3];
 
+    // Initialize backend
+
+    struct FjInstanceInitContext ctx = {0};
+    ctx.instance = inst;
+
+    uint32_t status = init(&ctx);
+
+    if (status != FJ_OK) {
+        fjInstanceDestroy(inst);
+        return status;
+    }
+
     return FJ_OK;
 }
 
@@ -79,31 +95,12 @@ void fjInstanceDestroy(struct FjInstance *inst)
 
 
 
-uint32_t fjWindowInit(
+uint32_t fjIntanceInitWindow(
     struct FjInstance *inst,
     struct FjWindow *win,
-    const int32_t *params
+    const struct FjWindowParams *params
 )
 {
-    uint32_t width = 640, height = 480;
-
-    for (int i=0; i<FJ_PARAM_MAX; i++)
-    {
-        switch (params[i]) {
-        case FJ_WPARAM_END:
-            i = FJ_PARAM_MAX;
-            continue;
-
-        case FJ_WPARAM_WIDTH:
-            width = params[++i];
-            continue;
-
-        case FJ_WPARAM_HEIGHT:
-            height = params[++i];
-            continue;
-        }
-    }
-
     win->inst = inst;
 
     win->windowId = xcb_generate_id(inst->connection);
@@ -112,8 +109,7 @@ uint32_t fjWindowInit(
     uint32_t properties[] = {
         inst->screen->black_pixel,
         // Select ALL meaningful events
-        ((uint32_t) 0x01FFFFFF /* ^ XCB_EVENT_MASK_NO_EVENT */)
-        // XCB_EVENT_MASK_EXPOSURE
+        ((uint32_t) 0x01FFFFFF)
     };
 
     xcb_create_window(
@@ -122,7 +118,7 @@ uint32_t fjWindowInit(
         win->windowId,
         inst->screen->root,
         0, 0, // X and Y, often ignored
-        width, height,
+        params->width, params->height,
         0, // border width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
         inst->screen->root_visual,
@@ -130,19 +126,15 @@ uint32_t fjWindowInit(
         properties
     );
 
-    xcb_atom_t wmProtocols[] = {
-        inst->atom_WM_DELETE_WINDOW
-    };
-
     xcb_change_property(
         inst->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
         inst->atom_WM_PROTOCOLS,
         XCB_ATOM_ATOM,
-        sizeof(*wmProtocols) * 8,
+        sizeof(xcb_atom_t) * 8,
         1,
-        wmProtocols
+        &inst->atom_WM_DELETE_WINDOW
     );
 
     return FJ_OK;
@@ -171,9 +163,6 @@ void fjWindowSetShown(struct FjWindow *win, uint32_t is_shown)
 
 uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
 {
-    if (!win || !win->inst)
-        return FJ_ERR_INVALID_PARAM;
-
     xcb_change_property(
         win->inst->connection,
         XCB_PROP_MODE_REPLACE,

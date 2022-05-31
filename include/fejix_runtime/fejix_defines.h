@@ -11,14 +11,11 @@
 
 
 // Error codes
-#define FJ_OK                   0
-#define FJ_ERR_MALLOC_FAIL      1
-#define FJ_ERR_WMAPI_FAIL       2
-#define FJ_ERR_BACKEND_FAIL     3
-#define FJ_ERR_UNKNOWN_PARAM    4
-#define FJ_ERR_UNKNOWN_BACKEND  5
-#define FJ_ERR_BACKEND_ABSENT   6
-#define FJ_ERR_INVALID_PARAM    7
+#define FJ_OK                       0
+#define FJ_ERR_MALLOC_FAIL          1
+#define FJ_ERR_WMAPI_FAIL           2
+#define FJ_ERR_BACKEND_FAIL         3
+#define FJ_ERR_INVALID_PARAM        4
 
 // Responses of event handlers
 #define FJ_EXIT                 1
@@ -27,17 +24,8 @@
 #define FJ_EVENT_CLOSE          1
 
 
-#define FJ_PARAM_MAX            1024
-
-// Instance parameters
-#define FJ_IPARAM_END            0
-#define FJ_IPARAM_USE_OPENGL     1
-
-// Window parameters 
-#define FJ_WPARAM_END           0
-#define FJ_WPARAM_RESIZABLE     1
-#define FJ_WPARAM_WIDTH         2
-#define FJ_WPARAM_HEIGHT        3
+#define FJ_BACKEND_NONE         0
+#define FJ_BACKEND_OPENGL       1
 
 
 #endif // _FEJIX_DEFINES_H_

@@ -26,3 +26,9 @@ cmake --build build
 
 I would appreciate adding support for other build systems.
 If you decide to add one, do not pollute the `src` or `include` directories with build scripts. Use `tools` instead.
+
+## Main Fejix rules
+
+1. We hate CSS
+2. We love Qt and Flutter
+3. We love `<stdint.h>`
