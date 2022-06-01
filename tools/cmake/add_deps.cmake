@@ -4,9 +4,10 @@ endif()
 
 if(FEJIX_USE_OPENGL3)
     target_include_directories(fejix_runtime PUBLIC "${SRC}/deps/glad/include")
-    target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/glad.c")
+    target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/gl.c")
 
     if(FEJIX_USE_X11)
-        target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/glad_glx.c")
+        target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/glx.c")
+        target_link_libraries(fejix_runtime "dl")
     endif()
 endif()

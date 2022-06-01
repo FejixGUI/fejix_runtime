@@ -35,7 +35,7 @@ option(BUILD_DEVTEST "Shall I build the development-only test?" OFF)
 
 if(BUILD_DEVTEST)
     add_executable(fejix_test "test/main.c")
-    target_sources(fejix_test PRIVATE "test/myassert.c")
+    target_sources(fejix_test PRIVATE "test/debug.c")
     target_include_directories(fejix_test PRIVATE "test")
     target_link_libraries(fejix_test fejix_runtime)
 endif()

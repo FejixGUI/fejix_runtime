@@ -20,8 +20,8 @@
 #   include <fejix_runtime/fejix_x11.h>
 #endif
 
-#ifdef FJ_USE_OPENGL
-#   include <glad/glad.h>
+#ifdef FJ_USE_OPENGL3
+#   include <glad/gl.h>
 #endif
 
 
@@ -92,6 +92,10 @@ void fjInstanceDestroy(
 
 uint32_t fjBackendInit(
     struct FjBackendInitContext *ctx
+);
+
+void fjBackendDestroy(
+    struct FjInstance *instance
 );
 
 uint32_t fjIntanceInitWindow(

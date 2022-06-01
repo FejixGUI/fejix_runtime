@@ -1,5 +1,5 @@
 /**
- * @file myassert.h
+ * @file debug.h
  *
  * assert.h leads to the dark side of the Force. Do not use it in devtest. 
  */
@@ -10,8 +10,8 @@
 #include <stdio.h>
 
 /// Fails if EXPR is false
-#define massert(EXPR) _massert(__FILE__, __LINE__, (EXPR) ? 1 : 0);
+#define _(RESULT) checkFj(__FILE__, __LINE__, (RESULT));
 
-void _massert(const char *file, int line, int value);
+void checkFj(const char *file, int line, int value);
 
 #endif // _MY_ASSERT_H_

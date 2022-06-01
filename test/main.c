@@ -4,12 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "myassert.h"
+#include "debug.h"
 
 
-uint32_t initInstance(FjBackendInitContext *ctx)
+uint32_t initBackend(FjBackendInitContext *ctx)
 {
-    return FJ_OK;
+    ctx->backend = FJ_BACKEND_OPENGL3;
+
+    return fjBackendInit(ctx);
 }
 
 
@@ -33,16 +35,16 @@ int main() {
     FjInstance inst = {0};
     FjWindow win = {0};
 
-    massert(fjInstanceInit(&inst, &initInstance) == FJ_OK);
+    _(fjInstanceInit(&inst, &initBackend));
 
     FjWindowParams wparams = {
         .width = 800,
         .height = 600
     };
 
-    massert(fjIntanceInitWindow(&inst, &win, &wparams) == FJ_OK);
+    _(fjIntanceInitWindow(&inst, &win, &wparams));
 
-    massert(fjWindowSetTitle(&win, "Це працює!") == FJ_OK);
+    _(fjWindowSetTitle(&win, "Це працює!"));
 
     fjWindowSetShown(&win, 1);
 

@@ -39,20 +39,28 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
     if (init == NULL)
         return FJ_ERR_INVALID_PARAM;
         
-    inst->xdisplay = XOpenDisplay(NULL);
+    inst->xDisplay = XOpenDisplay(NULL);
 
-    if (!inst->xdisplay)
+    if (!inst->xDisplay)
         return FJ_ERR_WMAPI_FAIL;
 
-    // inst->connection = xcb_connect(NULL, NULL);
+    inst->xDefaultScreen = XDefaultScreen(inst->xDisplay);
 
-    /* if (xcb_connection_has_error(inst->connection) != 0)
+    /* inst->connection = xcb_connect(NULL, NULL);
+
+    if (xcb_connection_has_error(inst->connection) != 0)
     {
         xcb_disconnect(inst->connection);
         return FJ_ERR_WMAPI_FAIL;
     } */
 
-    inst->connection = XGetXCBConnection(inst->xdisplay);
+    inst->connection = XGetXCBConnection(inst->xDisplay);
+    if (!inst->connection) {
+        XCloseDisplay(inst->xDisplay);
+        return FJ_ERR_WMAPI_FAIL;
+    }
+
+    XSetEventQueueOwner(inst->xDisplay, XCBOwnsEventQueue);
 
     inst->screen = xcb_setup_roots_iterator(
         xcb_get_setup(inst->connection)
@@ -77,6 +85,19 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
     inst->atom_WM_DELETE_WINDOW = atoms[2];
     inst->atom_WM_PROTOCOLS = atoms[3];
 
+    // This may be reassigned later by backend initializer
+    inst->windowVisualId = inst->screen->root_visual;
+
+    inst->colormapId = xcb_generate_id(inst->connection);
+
+    xcb_create_colormap(
+        inst->connection,
+        XCB_COLORMAP_ALLOC_NONE,
+        inst->colormapId,
+        inst->screen->root,
+        inst->windowVisualId
+    );
+
     // Initialize backend
 
     struct FjBackendInitContext ctx = {0};
@@ -96,8 +117,10 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
 void fjInstanceDestroy(struct FjInstance *inst)
 {
+    fjBackendDestroy(inst);
+
     // xcb_disconnect(inst->connection);
-    XCloseDisplay(inst->xdisplay);
+    XCloseDisplay(inst->xDisplay);
 }
 
 
@@ -112,11 +135,14 @@ uint32_t fjIntanceInitWindow(
 
     win->windowId = xcb_generate_id(inst->connection);
 
-    uint32_t propertiesMask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t propertiesMask = XCB_CW_BACK_PIXEL
+                            | XCB_CW_EVENT_MASK
+                            | XCB_CW_COLORMAP;
+
     uint32_t properties[] = {
         inst->screen->black_pixel,
-        // Select ALL meaningful events
-        ((uint32_t) 0x01FFFFFF)
+        (uint32_t) 0x01FFFFFF, // Select ALL meaningful events
+        inst->colormapId
     };
 
     xcb_create_window(
@@ -128,7 +154,7 @@ uint32_t fjIntanceInitWindow(
         params->width, params->height,
         0, // border width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
-        inst->screen->root_visual,
+        inst->windowVisualId,
         propertiesMask,
         properties
     );
