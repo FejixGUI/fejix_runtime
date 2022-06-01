@@ -36,6 +36,10 @@ void checkFj(const char *file, int line, int value)
         out("Window manager API failed");
         break;
 
+    case FJ_ERR_FEATURE_NOT_COMPILED:
+        out("Feature is not compiled (perhaps, define FJ_USE_X)");
+        break;
+
     default:
         printf("Unknown error code #%d [%s:%d]\n", value, file, line);       
         break;

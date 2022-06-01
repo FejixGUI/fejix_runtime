@@ -48,6 +48,7 @@ struct FjWindow {
     void *data;
 
 #ifdef FJ_USE_OPENGL3
+    GLXWindow glxwin;
     GLXContext glctx;
 #endif
 };

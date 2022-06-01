@@ -1,6 +1,8 @@
 #include <fejix_runtime/fejix_x11.h>
 #include <fejix_runtime/fejix.h>
 
+#include "fejix_backends.h"
+
 #include <string.h>
 #include <malloc.h>
 
@@ -119,8 +121,8 @@ void fjInstanceDestroy(struct FjInstance *inst)
 {
     fjBackendDestroy(inst);
 
-    // xcb_disconnect(inst->connection);
-    XCloseDisplay(inst->xDisplay);
+    xcb_disconnect(inst->connection);
+    // XCloseDisplay(inst->xDisplay);
 }
 
 
@@ -170,13 +172,16 @@ uint32_t fjIntanceInitWindow(
         &inst->atom_WM_DELETE_WINDOW
     );
 
-    return FJ_OK;
+    // fjWindowSetShown(win, 1);
+
+    return _fjBackendInitWindow(win);
 }
 
 
 
 void fjWindowDestroy(struct FjWindow *win)
 {
+    _fjBackendDestroyWindow(win);
     xcb_destroy_window(win->inst->connection, win->windowId);
 }
 
@@ -250,7 +255,16 @@ void fjLoop(
         switch (event->response_type & FJ_XCB_EVENT_MASK) 
         {
             case XCB_EXPOSE:
-                
+            {
+                xcb_expose_event_t *expose_event;
+                expose_event = (xcb_expose_event_t *) event;
+                win = findWindowById(windows, length, expose_event->window);
+                _fjWindowBeginDrawing(win);
+                glClearColor(1.0, 0.7, 0.0, 1.0);
+                glClear(GL_COLOR_BUFFER_BIT);
+                _fjWindowPresentDrawing(win);
+                _fjWindowEndDrawing(win);
+            }
             break;
 
             case XCB_CLIENT_MESSAGE:

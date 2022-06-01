@@ -1,15 +1,52 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/fejix_x11.h>
 
-static uint32_t init_opengl3(struct FjBackendInitContext *ctx); 
-static void destroy_opengl3(struct FjInstance *inst);
+#include "fejix_backends.h"
 
 
 uint32_t fjBackendInit(struct FjBackendInitContext *ctx)
 {
-    switch (ctx->backend) {
+    switch (ctx->backend)
+    {
         case FJ_BACKEND_OPENGL3:
-            return init_opengl3(ctx);
+#           ifdef FJ_USE_OPENGL3
+                return _fjBackendInit_gl3(ctx);
+#           else
+                return FJ_ERR_FEATURE_NOT_COMPILED;
+#           endif
+        break;
+
+        default:
+            return FJ_ERR_BACKEND_UNKNOWN;
+    }
+
+    return FJ_OK;
+}
+
+
+void fjBackendDestroy(struct FjInstance *inst)
+{
+    switch (inst->backend)
+    {
+        case FJ_BACKEND_OPENGL3:
+#           ifdef FJ_USE_OPENGL3
+                _fjBackendDestroy_gl3(inst);
+#           else                
+                return FJ_ERR_FEATURE_NOT_COMPILED;
+#           endif
+        break;
+    }
+}
+
+
+uint32_t _fjBackendInitWindow(struct FjWindow *win)
+{
+    switch (win->inst->backend)
+    {
+        case FJ_BACKEND_OPENGL3:
+#           ifdef FJ_USE_OPENGL3
+                _fjBackendInitWindow_gl3(win);
+#           endif
         break;
 
         default:
@@ -18,40 +55,65 @@ uint32_t fjBackendInit(struct FjBackendInitContext *ctx)
 }
 
 
-void fjBackendDestroy(struct FjInstance *inst)
+void _fjBackendDestroyWindow(struct FjWindow *win)
 {
-    switch (inst->backend) {
+    switch (win->inst->backend)
+    {
         case FJ_BACKEND_OPENGL3:
-            destroy_opengl3(inst);
+#           ifdef FJ_USE_OPENGL3
+                _fjBackendDestroyWindow_gl3(win);
+#           endif
         break;
+
+        default: return;
     }
 }
 
 
-
-uint32_t init_opengl3(struct FjBackendInitContext *ctx)
+uint32_t _fjWindowBeginDrawing(struct FjWindow *win)
 {
-    struct FjInstance *inst = ctx->instance;
+    switch (win->inst->backend)
+    {
+        case FJ_BACKEND_OPENGL3:
+#           ifdef FJ_USE_OPENGL3
+                return _fjWindowBeginDrawing_gl3(win);
+#           endif
+        break;
 
-    if (!gladLoaderLoadGLX(inst->xDisplay, inst->xDefaultScreen))
-        return FJ_ERR_BACKEND_FAIL;
-
-    // Don't even think about initializing OpenGL without an existing context!
-    /* if (!gladLoaderLoadGL())
-        return FJ_ERR_BACKEND_FAIL; */
-
-    const int visualAttr[] = {
-        GLX_DOUBLEBUFFER
-    };
-
-    // inst->windowVisualId = glXChooseVisual(disp, XDefaultScreen(disp), visualAttr);
-
-    inst->backend = FJ_BACKEND_OPENGL3;
+        default: break;
+    }
 
     return FJ_OK;
 }
 
-void destroy_opengl3(struct FjInstance *inst)
+
+void _fjWindowEndDrawing(struct FjWindow *win)
 {
-    gladLoaderUnloadGLX();
+    switch (win->inst->backend)
+    {
+        case FJ_BACKEND_OPENGL3:
+#           ifdef FJ_USE_OPENGL3
+                _fjWindowEndDrawing_gl3(win);
+#           endif
+        break;
+
+        default: return;
+    }
+}
+
+
+uint32_t _fjWindowPresentDrawing(struct FjWindow *win)
+{
+    switch (win->inst->backend)
+    {
+        case FJ_BACKEND_OPENGL3:
+#           ifdef FJ_USE_OPENGL3
+                return _fjWindowPresentDrawing_gl3(win);
+#           endif
+        break;
+
+        default: break;
+    }
+
+    return FJ_OK;
 }

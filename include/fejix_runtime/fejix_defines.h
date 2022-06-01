@@ -18,6 +18,7 @@
 #define FJ_ERR_BACKEND_UNKNOWN      4
 #define FJ_ERR_INVALID_PARAM        5
 #define FJ_ERR_INVALID_ENCODING     6
+#define FJ_ERR_FEATURE_NOT_COMPILED 7
 
 // Responses of event handlers
 #define FJ_EXIT                 1
