@@ -45,6 +45,9 @@ struct FjEvent {
     }; */
 };
 
+struct FjWindow;
+struct FjInstance;
+
 typedef uint32_t (*FjEventHandler)(
     struct FjWindow *win,
     struct FjEvent *ev
