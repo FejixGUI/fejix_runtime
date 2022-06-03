@@ -8,6 +8,11 @@
 
 #ifdef FJ_USE_OPENGL3
 #   include <glad/glx.h>
+
+// We are going to include <glad/gl.h> to load OpenGL
+// If we included <GL/glx.h> it would include <GL/gl.h>
+// which is incompatible with <glad/gl.h> 
+// #   include <GL/glx.h>   // <-- So, we do not use this
 #endif
 
 
@@ -46,6 +51,9 @@ struct FjWindow {
     xcb_window_t windowId;
     struct FjInstance *instance;
     void *data;
+
+    uint32_t width;
+    uint32_t height;
 
 #ifdef FJ_USE_OPENGL3
     GLXWindow glxwin;

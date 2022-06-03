@@ -24,6 +24,14 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
             fjWindowSetShown(win, 0);
             return FJ_EXIT;
         break;
+
+        case FJ_EVENT_RESIZE:
+            printf(
+                "I am resized: %dx%d\n",
+                ev->resizeEvent.width,
+                ev->resizeEvent.height
+            );
+        break;
     }
 
     return FJ_OK;
