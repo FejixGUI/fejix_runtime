@@ -21,7 +21,7 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
     {
         case FJ_EVENT_CLOSE:
             puts("Did you just close the window?");
-            fjWindowSetShown(win, 0);
+            fjWindowSetVisible(win, 0);
             return FJ_EXIT;
         break;
 
@@ -54,10 +54,11 @@ int main() {
 
     _(fjWindowSetTitle(&win, "Це працює!"));
 
-    fjWindowSetShown(&win, 1);
+    fjWindowSetVisible(&win, 1);
 
     FjWindow *windows[] = { &win };
-    fjLoop(&inst, &handleEvent, windows, 1);
+    fjInstanceSetWindows(&inst, windows, 1);
+    fjLoop(&inst, &handleEvent);
 
     fjWindowDestroy(&win);
 

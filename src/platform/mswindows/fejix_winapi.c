@@ -111,9 +111,9 @@ void fjWindowDestroy(struct FjWindow *win)
 }
 
 
-void fjWindowSetShown(struct FjWindow *win, uint32_t shown)
+void fjWindowSetVisible(struct FjWindow *win, uint32_t visible)
 {
-    ShowWindow(win->hWnd, shown);
+    ShowWindow(win->hWnd, visible);
 }
 
 
@@ -214,14 +214,14 @@ LRESULT CALLBACK _winProc(
         PAINTSTRUCT ps;
         win->hDC = BeginPaint(hwnd, &ps);
 
-        _fjWindowBeginDrawing(win);
+        _fjDrawBegin(win);
 
         glClearColor(1.0f, 0.7f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        _fjWindowEndDrawing(win);
+        _fjDrawEnd(win);
 
-        _fjWindowPresentDrawing(win);
+        _fjDrawPresent(win);
 
         return 0;
     }

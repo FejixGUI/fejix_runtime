@@ -1,5 +1,5 @@
 if(FEJIX_USE_X11)
-    target_link_libraries(fejix_runtime "xcb" "X11" "X11-xcb")
+    target_link_libraries(fejix_runtime "xcb" "X11" "X11-xcb" "xcb-sync")
 endif()
 
 if(FEJIX_USE_OPENGL3)

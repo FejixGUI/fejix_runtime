@@ -11,11 +11,11 @@ uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win);
 
 void _fjBackendDestroyWindow_gl3(struct FjWindow *win); 
 
-uint32_t _fjWindowBeginDrawing_gl3(struct FjWindow *win);
+uint32_t _fjDrawBegin_gl3(struct FjWindow *win, uint32_t W, uint32_t H);
 
-void _fjWindowEndDrawing_gl3(struct FjWindow *win);
+void _fjDrawEnd_gl3(struct FjWindow *win);
 
-uint32_t _fjWindowPresentDrawing_gl3(struct FjWindow *win);
+uint32_t _fjDrawPresent_gl3(struct FjWindow *win);
 
 
 #endif // _FEJIX_BACKEND_DEF_OPENGL3_H_

@@ -57,7 +57,7 @@ void _fjBackendDestroyWindow_gl3(struct FjWindow *win)
 
 
 
-uint32_t _fjWindowBeginDrawing_gl3(struct FjWindow *win)
+uint32_t _fjDrawBegin_gl3(struct FjWindow *win)
 {
     if (!wglMakeCurrent(win->hDC, win->glctx))
         return FJ_ERR_BACKEND_FAIL;
@@ -67,14 +67,14 @@ uint32_t _fjWindowBeginDrawing_gl3(struct FjWindow *win)
 
 
 
-void _fjWindowEndDrawing_gl3(struct FjWindow *win)
+void _fjDrawEnd_gl3(struct FjWindow *win)
 {
     wglMakeCurrent(win->hDC, NULL);
 }
 
 
 
-uint32_t _fjWindowPresentDrawing_gl3(struct FjWindow *win)
+uint32_t _fjDrawPresent_gl3(struct FjWindow *win)
 {
     if (!SwapBuffers(win->hDC))
         return FJ_ERR_WMAPI_FAIL;

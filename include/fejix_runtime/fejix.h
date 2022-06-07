@@ -85,9 +85,22 @@ void fjWindowDestroy(
     struct FjWindow *window
 );
 
-void fjWindowSetShown(
+/**
+ * @brief Sets the list of windows that are to be processed in the main loop.
+ * 
+ * @param windows Pointer to the array of pointers to windows (can be changed
+ * dynamically)
+ * @param windowsLen Length of the array 
+ */
+void fjInstanceSetWindows(
+    struct FjInstance *instance,
+    struct FjWindow **windows,
+    uint32_t windowsLen
+);
+
+void fjWindowSetVisible(
     struct FjWindow *window,
-    uint32_t shown
+    uint32_t visible
 );
 
 /**
@@ -108,14 +121,10 @@ uint32_t fjWindowSetTitle(
  * 
  * @param instance Fejix instance
  * @param eventHandler Handler for all global events
- * @param windows Array of windows which will be renderered to
- * @param numberOfWindows Length of windows array
  */
 void fjLoop(
     struct FjInstance *instance,
-    FjEventHandler eventHandler,
-    struct FjWindow **windows,
-    uint32_t numberOfWindows
+    FjEventHandler eventHandler
 );
 
 

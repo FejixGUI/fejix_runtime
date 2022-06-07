@@ -18,17 +18,13 @@ Allocation of windows and widgets is not handled by Fejix runtime.
 
 ## Build
 
-Currently, the only way to build Fejix is to use CMake:
 ```sh
 cmake -B build
 cmake --build build
 ```
 
-I would appreciate adding support for other build systems.
-If you decide to add one, do not pollute the `src` or `include` directories with build scripts. Use `tools` instead.
+### Build requirements
 
-## Main Fejix rules
+**X11:**
 
-1. We hate CSS
-2. We love Qt and Flutter
-3. We love `<stdint.h>`
+* `libxcb-sync-dev`

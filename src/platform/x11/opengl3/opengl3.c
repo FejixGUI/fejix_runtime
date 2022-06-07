@@ -131,7 +131,7 @@ void _fjBackendDestroyWindow_gl3(struct FjWindow *win)
 }
 
 
-uint32_t _fjWindowBeginDrawing_gl3(struct FjWindow *win)
+uint32_t _fjDrawBegin_gl3(struct FjWindow *win, uint32_t W, uint32_t H)
 {
     glXMakeContextCurrent(
         win->instance->xDisplay,
@@ -139,10 +139,14 @@ uint32_t _fjWindowBeginDrawing_gl3(struct FjWindow *win)
         win->glxwin,
         win->glctx
     );
+
+    glViewport(0, 0, W, H);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
 }
 
 
-void _fjWindowEndDrawing_gl3(struct FjWindow *win)
+void _fjDrawEnd_gl3(struct FjWindow *win)
 {
     glXMakeContextCurrent(
         win->instance->xDisplay,
@@ -150,9 +154,21 @@ void _fjWindowEndDrawing_gl3(struct FjWindow *win)
     );
 }
 
-uint32_t _fjWindowPresentDrawing_gl3(struct FjWindow *win)
+uint32_t _fjDrawPresent_gl3(struct FjWindow *win)
 {
+    glXMakeContextCurrent(
+        win->instance->xDisplay,
+        win->glxwin,
+        win->glxwin,
+        win->glctx
+    );
+
     glXSwapBuffers(win->instance->xDisplay, win->glxwin);
+
+    glXMakeContextCurrent(
+        win->instance->xDisplay,
+        0, 0, 0
+    );
 
     return FJ_OK;
 }

@@ -70,13 +70,13 @@ void _fjBackendDestroyWindow(struct FjWindow *win)
 }
 
 
-uint32_t _fjWindowBeginDrawing(struct FjWindow *win)
+uint32_t _fjDrawBegin(struct FjWindow *win, uint32_t width, uint32_t height)
 {
     switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
-                return _fjWindowBeginDrawing_gl3(win);
+                return _fjDrawBegin_gl3(win, width, height);
 #           endif
         break;
 
@@ -87,13 +87,13 @@ uint32_t _fjWindowBeginDrawing(struct FjWindow *win)
 }
 
 
-void _fjWindowEndDrawing(struct FjWindow *win)
+void _fjDrawEnd(struct FjWindow *win)
 {
     switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
-                _fjWindowEndDrawing_gl3(win);
+                _fjDrawEnd_gl3(win);
 #           endif
         break;
 
@@ -102,13 +102,13 @@ void _fjWindowEndDrawing(struct FjWindow *win)
 }
 
 
-uint32_t _fjWindowPresentDrawing(struct FjWindow *win)
+uint32_t _fjDrawPresent(struct FjWindow *win)
 {
     switch (win->instance->backend)
     {
         case FJ_BACKEND_OPENGL3:
 #           ifdef FJ_USE_OPENGL3
-                return _fjWindowPresentDrawing_gl3(win);
+                return _fjDrawPresent_gl3(win);
 #           endif
         break;
 

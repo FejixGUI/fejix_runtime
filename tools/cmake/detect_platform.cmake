@@ -21,6 +21,11 @@ elseif(FEJIX_HAS_X11)
 
     set(FEJIX_USE_X11 ON)
 
+    check_include_files("xcb/sync.h" FEJIX_HAS_XCB_SYNC)
+    if(NOT FEJIX_HAS_XCB_SYNC)
+        message(FATAL_ERROR "Please, install libxcb-sync-dev, then clear CMake cache")
+    endif()
+
     target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_X11")
 
 else()

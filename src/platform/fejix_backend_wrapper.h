@@ -11,9 +11,9 @@
 uint32_t _fjBackendInitWindow(struct FjWindow *win); 
 void _fjBackendDestroyWindow(struct FjWindow *win); 
 
-uint32_t _fjWindowBeginDrawing(struct FjWindow *win);
-uint32_t _fjWindowPresentDrawing(struct FjWindow *win);
-void _fjWindowEndDrawing(struct FjWindow *win);
+uint32_t _fjDrawBegin(struct FjWindow *win, uint32_t width, uint32_t height);
+uint32_t _fjDrawPresent(struct FjWindow *win);
+void _fjDrawEnd(struct FjWindow *win);
 
 
 
