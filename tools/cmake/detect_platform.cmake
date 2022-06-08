@@ -1,12 +1,8 @@
-# Let's make it clear.
-# FEJIX_FORCE_XXX - argument for this script; forces to use XXX
-# FEJIX_USE_XXX - result of this script that indicated that XXX will be used
+# FEJIX_USE_XXX - result of this script that indicates that XXX will be used
 # FEJIX_HAS_XXX - a header XXX.h is detected
 
 check_include_files("windows.h" FEJIX_HAS_WINAPI)
-# check_include_files("xcb/xcb.h" FEJIX_HAS_XCB)
-# check_include_files("X11/Xlib.h" FEJIX_HAS_XLIB)
-check_include_files("X11/Xlib-xcb.h" FEJIX_HAS_X11)
+check_include_files("X11/Xlib.h" FEJIX_HAS_X11)
 
 set(FEJIX_USE_WINAPI OFF)
 set(FEJIX_USE_X11 OFF)
@@ -21,7 +17,10 @@ elseif(FEJIX_HAS_X11)
 
     set(FEJIX_USE_X11 ON)
 
+    check_include_files("xcb/xcb.h" FEJIX_HAS_XCB)
+    check_include_files("X11/Xlib-xcb.h" FEJIX_HAS_XLIB_XCB)
     check_include_files("xcb/sync.h" FEJIX_HAS_XCB_SYNC)
+    check_include_files("xcb/xcb_icccm.h" FEJIX_HAS_XCB_ICCCM)
     if(NOT FEJIX_HAS_XCB_SYNC)
         message(FATAL_ERROR "Please, install libxcb-sync-dev, then clear CMake cache")
     endif()

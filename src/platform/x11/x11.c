@@ -1,18 +1,12 @@
 #include <fejix_runtime/fejix_x11.h>
 #include <fejix_runtime/fejix.h>
 
-#include "fejix_backend_wrapper.h"
+#include <fejix_private.h>
+#include <platform/backend_wrapper.h>
+#include <platform/x11/window_utils.h>
 
 #include <string.h>
 #include <malloc.h>
-
-#include <stdio.h>
-
-
-/// Length of a static array
-#define LEN(ARR) (sizeof(ARR) / sizeof(*(ARR)))
-
-#define SIZEOF_BITS(THING) (sizeof(THING) * 8)
 
 
 
@@ -58,14 +52,6 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
     inst->xDefaultScreen = XDefaultScreen(inst->xDisplay);
 
-    /* inst->connection = xcb_connect(NULL, NULL);
-
-    if (xcb_connection_has_error(inst->connection) != 0)
-    {
-        xcb_disconnect(inst->connection);
-        return FJ_ERR_WMAPI_FAIL;
-    } */
-
     inst->connection = XGetXCBConnection(inst->xDisplay);
     if (!inst->connection) {
         XCloseDisplay(inst->xDisplay);
@@ -88,7 +74,7 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
         "_NET_WM_SYNC_REQUEST_COUNTER",
     };
 
-    int nAtoms = LEN(atom_names);
+    int nAtoms = STATIC_LEN(atom_names);
     xcb_atom_t atoms[nAtoms];
 
     uint32_t result = getAtoms(inst->connection, atom_names, atoms, nAtoms);
@@ -117,6 +103,8 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
     // Initialize backend
 
+    inst->backend = FJ_BACKEND_NONE;
+
     struct FjBackendInitContext ctx = {0};
     ctx.instance = inst;
 
@@ -134,7 +122,8 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
 void fjInstanceDestroy(struct FjInstance *inst)
 {
-    fjBackendDestroy(inst);
+    if (inst->backend != FJ_BACKEND_NONE)
+        fjBackendDestroy(inst);
 
     xcb_disconnect(inst->connection);
     // Xlib doesn't care about the opened display
@@ -147,7 +136,7 @@ void fjInstanceDestroy(struct FjInstance *inst)
 uint32_t fjIntanceInitWindow(
     struct FjInstance *inst,
     struct FjWindow *win,
-    const struct FjWindowParams *params
+    struct FjWindowParams *params
 )
 {
     win->instance = inst;
@@ -182,6 +171,8 @@ uint32_t fjIntanceInitWindow(
     win->width = params->width;
     win->height = params->height;
 
+    _fjWindowInitParams(win, params);
+
     xcb_atom_t protocols[] = {
         inst->atom_NET_WM_SYNC_REQUEST,
         inst->atom_WM_DELETE_WINDOW
@@ -194,29 +185,11 @@ uint32_t fjIntanceInitWindow(
         inst->atom_WM_PROTOCOLS,
         XCB_ATOM_ATOM,
         SIZEOF_BITS(*protocols),
-        LEN(protocols),
+        STATIC_LEN(protocols),
         protocols
     );
 
-    win->syncCounter = xcb_generate_id(inst->connection);
-    win->syncValue = (xcb_sync_int64_t) { 0, 0 };
-    xcb_sync_create_counter(
-        inst->connection,
-        win->syncCounter,
-        win->syncValue
-    );
-
-    xcb_change_property(
-        win->instance->connection,
-        XCB_PROP_MODE_REPLACE,
-        win->windowId,
-        win->instance->atom_NET_WM_SYNC_REQUEST_COUNTER,
-        XCB_ATOM_CARDINAL,
-        SIZEOF_BITS(win->syncCounter),
-        1,
-        &win->syncCounter
-    );
-    xcb_flush(inst->connection);
+    _fjWindowInitSyncCounter(win);
 
     return _fjBackendInitWindow(win);
 }
@@ -226,7 +199,7 @@ uint32_t fjIntanceInitWindow(
 void fjWindowDestroy(struct FjWindow *win)
 {
     _fjBackendDestroyWindow(win);
-    xcb_sync_destroy_counter(win->instance->connection, win->syncCounter);
+    _fjWindowDestroySyncCounter(win);
     xcb_destroy_window(win->instance->connection, win->windowId);
 }
 
@@ -260,127 +233,4 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
     xcb_flush(win->instance->connection);
 
     return FJ_OK;
-}
-
-
-/// Returns: pointer to the window from the list that has the specified ID.
-// If such a window was not found, returns NULL
-static struct FjWindow* findWindowById(
-    struct FjInstance *inst,
-    xcb_window_t id
-)
-{
-    for (int i=0; i<inst->windowsLen; i++)
-        if (inst->windows[i]->windowId == id)
-            return inst->windows[i];
-
-    return NULL;
-}
-
-
-static void incrSyncCounter(struct FjWindow *win)
-{
-    int64_t *val = (void *) &win->syncValue; // Yay! Unsafe code!
-    val++;
-
-    xcb_sync_set_counter(
-        win->instance->connection,
-        win->syncCounter,
-        win->syncValue
-    );
-
-    xcb_flush(win->instance->connection);
-}
-
-
-void fjLoop(
-    struct FjInstance *inst,
-    FjEventHandler handle
-)
-{
-    for (;;)
-    {
-        xcb_generic_event_t *event = xcb_wait_for_event(inst->connection);
-
-        if (event == NULL)
-            return;
-
-        struct FjWindow *win = NULL;
-        struct FjEvent ev = {0};
-        int canHandle = 0;
-        
-        switch (event->response_type & FJ_XCB_EVENT_MASK) 
-        {
-            case XCB_EXPOSE:
-            {
-                xcb_expose_event_t *exposeEvent = (void *) event;
-                win = findWindowById(inst, exposeEvent->window);
-                if (!win) break;
-
-                incrSyncCounter(win);
-                _fjDrawPresent(win);
-                incrSyncCounter(win);
-            }
-            break;
-
-            case XCB_CONFIGURE_NOTIFY:
-            {
-                xcb_configure_notify_event_t *configEvent = (void *) event;
-                win = findWindowById(inst, configEvent->window);
-                if (!win) break;
-
-                uint32_t W = configEvent->width;
-                uint32_t H = configEvent->height;
-
-                _fjDrawBegin(win, win->width, win->height);
-                // TODO draw the window here
-                _fjDrawEnd(win);
-
-                if (win->width != W || win->height != H) {
-                    win->width = W;
-                    win->height = H;
-                    ev.eventType = FJ_EVENT_RESIZE;
-                    ev.resizeEvent.width = W;
-                    ev.resizeEvent.height = H;
-                    canHandle = 1;
-                }
-
-            }
-            break;
-
-            case XCB_CLIENT_MESSAGE:
-            {
-                xcb_client_message_event_t *clientEvent = (void *) event;
-                uint32_t *data = clientEvent->data.data32;
-
-                win = findWindowById(inst, clientEvent->window);
-                if (!win) break;
-                
-                uint32_t msgType = data[0];
-                if (msgType == inst->atom_WM_DELETE_WINDOW)
-                {
-                    ev.eventType = FJ_EVENT_CLOSE;
-                    canHandle = 1;
-                }
-                else if (msgType == inst->atom_NET_WM_SYNC_REQUEST)
-                {
-                    win->syncValue.lo = data[2];
-                    win->syncValue.hi = data[3];
-                }
-
-            }
-            break;
-
-            default: break;
-        }
-
-        free(event);
-
-        if (canHandle && win != NULL) {
-            uint32_t response = handle(win, &ev);
-
-            if (response == FJ_EXIT)
-                return;
-        }
-    }
 }

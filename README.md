@@ -27,4 +27,6 @@ cmake --build build
 
 **X11:**
 
+* `libx11-xcb-dev`
 * `libxcb-sync-dev`
+* `libxcb-icccm4-dev`

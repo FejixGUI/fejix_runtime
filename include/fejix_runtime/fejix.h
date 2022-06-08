@@ -4,7 +4,7 @@
  * @version 0.0.1
  * @date 2022-05-31
  * 
- * This file contains the core features of Fejix runtime. 
+ * This file contains the core features of Fejix runtime.
  * 
  */
 
@@ -37,12 +37,31 @@ typedef uint32_t (*FjBackendInitializer) (
 );
 
 
-
+/**
+ * @brief Window parameters
+ * 
+ */
 struct FjWindowParams {
+    /// Initial width of the window; mandatory to set
     uint32_t width;
+    /// Initial height of the window; mandatory to set
     uint32_t height;
 
-    // unsigned resizable: 1;
+    /// Minimal width; set to 0 to ignore
+    uint32_t minWidth;  
+    /// Minimal height; set to 0 to ignore
+    uint32_t minHeight; 
+
+    /// Maximum width; set to 0 to ignore
+    uint32_t maxWidth;  
+    /// Maximum height; set to 0 to ignore
+    uint32_t maxHeight; 
+
+    /**
+     * When 0, indicated that the window must be neither resizable,
+     * nor maximizable 
+     */
+    unsigned isResizable: 1;
 };
 
 
@@ -78,7 +97,7 @@ void fjBackendDestroy(
 uint32_t fjIntanceInitWindow(
     struct FjInstance *instance,
     struct FjWindow *window,
-    const struct FjWindowParams *params
+    struct FjWindowParams *params
 );
 
 void fjWindowDestroy(

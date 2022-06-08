@@ -11,7 +11,12 @@ uint32_t initBackend(FjBackendInitContext *ctx)
 {
     ctx->backend = FJ_BACKEND_OPENGL3;
 
-    return fjBackendInit(ctx);
+    uint32_t status = fjBackendInit(ctx);
+
+    if (status != FJ_OK)
+        puts("Error: cannot initialize OpenGL 3!");
+
+    return status;
 }
 
 
@@ -26,6 +31,7 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
         break;
 
         case FJ_EVENT_RESIZE:
+            // The following code makes resizing jerky
             printf(
                 "I am resized: %dx%d\n",
                 ev->resizeEvent.width,
@@ -47,7 +53,12 @@ int main() {
 
     FjWindowParams wparams = {
         .width = 800,
-        .height = 600
+        .height = 600,
+        // .minWidth = 100,
+        // .minHeight = 70,
+        // .maxWidth = 1000,
+        // .maxHeight = 900,
+        .isResizable = 0
     };
 
     _(fjIntanceInitWindow(&inst, &win, &wparams));

@@ -6,6 +6,7 @@
 
 #include <X11/Xlib-xcb.h>
 #include <xcb/sync.h>
+#include <xcb/xcb_icccm.h>
 
 #ifdef FJ_USE_OPENGL3
 #   include <glad/glx.h>

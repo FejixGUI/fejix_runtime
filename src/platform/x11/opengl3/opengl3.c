@@ -1,4 +1,4 @@
-#include "backend_def/opengl3.h"
+#include <platform/backend_definitions/opengl3.h>
 
 
 
@@ -143,6 +143,8 @@ uint32_t _fjDrawBegin_gl3(struct FjWindow *win, uint32_t W, uint32_t H)
     glViewport(0, 0, W, H);
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    return FJ_OK;
 }
 
 

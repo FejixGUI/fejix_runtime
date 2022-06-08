@@ -1,3 +1,5 @@
+// This file includes everything that is platform-independent
+
 #include <fejix_runtime/fejix.h>
 
 void fjInstanceSetWindows(
