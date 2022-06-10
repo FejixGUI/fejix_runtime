@@ -1,14 +1,20 @@
 target_sources(fejix_runtime
     PRIVATE
     "${SRC}/src/fejix_generic.c"
-    "${SRC}/src/platform/backend_wrapper.c"
-    # "${SRC}/src/fejix_stdui.c"
+    "${SRC}/src/platform/backend.c"
 )
 
 target_include_directories(
     fejix_runtime PRIVATE
     "${SRC}/src"
 )
+
+if (FEJIX_USE_OPENGL3)
+    target_sources(
+        fejix_runtime PRIVATE
+        "${SRC}/src/draw/opengl3/opengl3.c"
+    )
+endif()
 
 if(FEJIX_USE_WINAPI)
 

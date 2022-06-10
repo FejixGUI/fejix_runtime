@@ -1,12 +1,14 @@
 #include <fejix_runtime/fejix_x11.h>
 #include <fejix_runtime/fejix.h>
+#include <fejix_runtime/fejix_backend.h>
 
 #include <fejix_private.h>
-#include <platform/backend_wrapper.h>
 #include <platform/x11/window_utils.h>
 
 #include <string.h>
 #include <malloc.h>
+
+
 
 
 
@@ -103,7 +105,7 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
     // Initialize backend
 
-    inst->backend = FJ_BACKEND_NONE;
+    inst->backend.id = FJ_BACKEND_NONE;
 
     struct FjBackendInitContext ctx = {0};
     ctx.instance = inst;
@@ -122,8 +124,8 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
 
 void fjInstanceDestroy(struct FjInstance *inst)
 {
-    if (inst->backend != FJ_BACKEND_NONE)
-        fjBackendDestroy(inst);
+    if (inst->backend.id != FJ_BACKEND_NONE)
+        inst->backend.destroy(&inst->backend);
 
     xcb_disconnect(inst->connection);
     // Xlib doesn't care about the opened display
@@ -191,14 +193,17 @@ uint32_t fjIntanceInitWindow(
 
     _fjWindowInitSyncCounter(win);
 
-    return _fjBackendInitWindow(win);
+    win->root = NULL;
+
+    return inst->backend.initWindow(&inst->backend, win);
 }
 
 
 
 void fjWindowDestroy(struct FjWindow *win)
 {
-    _fjBackendDestroyWindow(win);
+    struct _FjBackend *bk = &win->instance->backend;
+    bk->destroyWindow(bk, win);
     _fjWindowDestroySyncCounter(win);
     xcb_destroy_window(win->instance->connection, win->windowId);
 }

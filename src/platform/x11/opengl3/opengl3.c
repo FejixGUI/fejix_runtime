@@ -1,4 +1,7 @@
+#include <fejix_runtime/fejix.h>
+
 #include <platform/backend_definitions/opengl3.h>
+#include <draw/draw.h>
 
 
 
@@ -61,21 +64,28 @@ uint32_t _fjBackendInit_gl3(struct FjBackendInitContext *ctx)
         instance->windowVisualId
     );
 
-    instance->backend = FJ_BACKEND_OPENGL3;
+    instance->backend.id = FJ_BACKEND_OPENGL3;
+
+    instance->backend.destroy = &_fjBackendDestroy_gl3;
+    instance->backend.initWindow = &_fjBackendInitWindow_gl3;
+    instance->backend.destroyWindow = &_fjBackendDestroyWindow_gl3;
+    instance->backend.draw = &_fjBackendDraw_gl3;
+    instance->backend.present = &_fjBackendPresent_gl3;
 
     return FJ_OK;
 }
 
 
 
-void _fjBackendDestroy_gl3(struct FjInstance *instance)
+void _fjBackendDestroy_gl3(struct _FjBackend *bk)
 {
+    bk->id = FJ_BACKEND_NONE;
     gladLoaderUnloadGLX();
 }
 
 
 
-uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win)
+uint32_t _fjBackendInitWindow_gl3(struct _FjBackend *bk, struct FjWindow *win)
 {
     struct FjInstance *instance = win->instance;
 
@@ -107,7 +117,7 @@ uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win)
 
     if (glClear == NULL) {
         glXMakeContextCurrent(
-            win->instance->xDisplay,
+            instance->xDisplay,
             win->glxwin,
             win->glxwin,
             win->glctx
@@ -115,7 +125,7 @@ uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win)
 
         if (!gladLoaderLoadGL()) {
             glXDestroyContext(instance->xDisplay, win->glctx);
-            glXDestroyWindow(win->instance->xDisplay, win->glxwin);
+            glXDestroyWindow(instance->xDisplay, win->glxwin);
             return FJ_ERR_WMAPI_FAIL;
         }
     }
@@ -124,14 +134,19 @@ uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win)
 }
 
 
-void _fjBackendDestroyWindow_gl3(struct FjWindow *win)
+void _fjBackendDestroyWindow_gl3(struct _FjBackend *bk, struct FjWindow *win)
 {
     glXDestroyWindow(win->instance->xDisplay, win->glxwin);
     glXDestroyContext(win->instance->xDisplay, win->glctx);
 }
 
 
-uint32_t _fjDrawBegin_gl3(struct FjWindow *win, uint32_t W, uint32_t H)
+uint32_t _fjBackendDraw_gl3(
+    struct _FjBackend *bk,
+    struct FjWindow *win,
+    uint32_t W,
+    uint32_t H
+)
 {
     glXMakeContextCurrent(
         win->instance->xDisplay,
@@ -144,19 +159,18 @@ uint32_t _fjDrawBegin_gl3(struct FjWindow *win, uint32_t W, uint32_t H)
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    return FJ_OK;
-}
+    _fjBackendDrawSomething_gl3();
 
-
-void _fjDrawEnd_gl3(struct FjWindow *win)
-{
     glXMakeContextCurrent(
         win->instance->xDisplay,
         0, 0, 0
     );
+
+    return FJ_OK;
 }
 
-uint32_t _fjDrawPresent_gl3(struct FjWindow *win)
+
+uint32_t _fjBackendPresent_gl3(struct _FjBackend *bk, struct FjWindow *win)
 {
     glXMakeContextCurrent(
         win->instance->xDisplay,

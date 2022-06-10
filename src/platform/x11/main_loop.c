@@ -1,9 +1,14 @@
 #include <fejix_runtime/fejix.h>
 
 #include <platform/x11/window_utils.h>
-#include <platform/backend_wrapper.h>
+// #include <draw/draw.h>
 
 #include <malloc.h>
+
+// Why isn't it included in XCB???
+#define FJ_XCB_EVENT_MASK (~0x80)
+
+
 
 /// Returns: pointer to the window from the list that has the specified ID.
 // If such a window was not found, returns NULL
@@ -25,6 +30,8 @@ void fjLoop(
     FjEventHandler handle
 )
 {
+    struct _FjBackend *backend = &inst->backend;
+
     for (;;)
     {
         xcb_generic_event_t *event = xcb_wait_for_event(inst->connection);
@@ -45,7 +52,7 @@ void fjLoop(
                 if (!win) break;
 
                 _fjWindowIncrSyncCounter(win);
-                _fjDrawPresent(win);
+                backend->present(backend, win);
                 _fjWindowIncrSyncCounter(win);
             }
             break;
@@ -59,9 +66,7 @@ void fjLoop(
                 uint32_t W = configEvent->width;
                 uint32_t H = configEvent->height;
 
-                _fjDrawBegin(win, win->width, win->height);
-                // TODO draw the window here
-                _fjDrawEnd(win);
+                backend->draw(backend, win, win->width, win->height);
 
                 if (win->width != W || win->height != H) {
                     win->width = W;

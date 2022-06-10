@@ -3,8 +3,16 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <inttypes.h>
 
 #include "debug.h"
+
+#ifndef __cplusplus
+#   define true 1
+#   define false 0
+#endif
+
+#define arrlen(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
 
 
 uint32_t initBackend(FjBackendInitContext *ctx)
@@ -31,12 +39,16 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
         break;
 
         case FJ_EVENT_RESIZE:
-            // The following code makes resizing jerky
-            printf(
-                "I am resized: %dx%d\n",
+        {
+            char title[32];
+            sprintf(
+                title,
+                "%" PRIu32 "x" "%" PRIu32,
                 ev->resizeEvent.width,
                 ev->resizeEvent.height
             );
+            fjWindowSetTitle(win, title);
+        }
         break;
     }
 
@@ -44,31 +56,30 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
 }
 
 
-int main() {
-    
-    FjInstance inst = {0};
-    FjWindow win = {0};
+FjInstance inst = {0};
+FjWindow win = {0};
 
+
+
+int main() {
     _(fjInstanceInit(&inst, &initBackend));
 
     FjWindowParams wparams = {
         .width = 800,
         .height = 600,
-        // .minWidth = 100,
-        // .minHeight = 70,
-        // .maxWidth = 1000,
-        // .maxHeight = 900,
-        .isResizable = 0
+        .minWidth = 100,
+        .minHeight = 70,
+        .isResizable = 1
     };
 
     _(fjIntanceInitWindow(&inst, &win, &wparams));
 
     _(fjWindowSetTitle(&win, "Це працює!"));
 
-    fjWindowSetVisible(&win, 1);
+    fjWindowSetVisible(&win, true);
 
     FjWindow *windows[] = { &win };
-    fjInstanceSetWindows(&inst, windows, 1);
+    fjInstanceSetWindows(&inst, windows, arrlen(windows));
     fjLoop(&inst, &handleEvent);
 
     fjWindowDestroy(&win);

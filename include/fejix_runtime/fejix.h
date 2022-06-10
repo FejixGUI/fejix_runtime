@@ -1,8 +1,6 @@
 /**
  * @file fejix.h
  * @brief Core features of Fejix runtime
- * @version 0.0.1
- * @date 2022-05-31
  * 
  * This file contains the core features of Fejix runtime.
  * 
@@ -10,6 +8,10 @@
 
 #ifndef _FEJIX_H_
 #define _FEJIX_H_
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
 
 
 #include <fejix_runtime/fejix_defines.h>
@@ -58,8 +60,7 @@ struct FjWindowParams {
     uint32_t maxHeight; 
 
     /**
-     * When 0, indicated that the window must be neither resizable,
-     * nor maximizable 
+     * When 0, indicates that the window must not be resizable or maximizable 
      */
     unsigned isResizable: 1;
 };
@@ -88,10 +89,6 @@ void fjInstanceDestroy(
 
 uint32_t fjBackendInit(
     struct FjBackendInitContext *ctx
-);
-
-void fjBackendDestroy(
-    struct FjInstance *instance
 );
 
 uint32_t fjIntanceInitWindow(
@@ -126,8 +123,8 @@ void fjWindowSetVisible(
  * @brief Sets window title.
  * 
  * @param window Window
- * @param title UTF-8 string ending with NULL-terminator
- * @return uint32_t FJ_OK or error code
+ * @param title UTF-8 string ending with a NULL-terminator
+ * @return FJ_OK or error code
  */
 uint32_t fjWindowSetTitle(
     struct FjWindow *window,
@@ -136,7 +133,7 @@ uint32_t fjWindowSetTitle(
 
 
 /**
- * @brief Runs main GUI loop.
+ * @brief Runs the main GUI loop.
  * 
  * @param instance Fejix instance
  * @param eventHandler Handler for all global events
@@ -145,6 +142,44 @@ void fjLoop(
     struct FjInstance *instance,
     FjEventHandler eventHandler
 );
+
+
+struct FjXY {
+    int32_t x;
+    int32_t y;
+};
+
+struct FjXY2 {
+    int32_t x1;
+    int32_t y1;
+    int32_t x2;
+    int32_t y2;
+};
+
+
+struct FjWidget {
+    struct FjWidget *container; // Parent
+    struct FjWidget **content;  // Children
+
+    void *data;                 // Widget's local data
+
+    struct FjXY2 constraints;   // Min/Max sizes
+    struct FjXY  weights;       // Size coefficients
+    struct FjXY2 _geometry;     // Variable set of coordinates 
+
+    uint32_t contentLength;     // Number of children
+    uint32_t _contentIndex;     // Used during layout traversal
+
+    // Functions
+    // FjLayoutFn layout;
+    // FjDrawFn draw;
+    // FjCursorHandlerFn handle;
+};
+
+
+#ifdef __cplusplus
+    } // extern "C"
+#endif
 
 
 #endif // _FEJIX_H_
