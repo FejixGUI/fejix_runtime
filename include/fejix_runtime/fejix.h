@@ -28,14 +28,14 @@
 
 
 
-struct FjBackendInitContext {
+struct FjBackendParams {
     struct FjInstance *instance;
     uint32_t backend;
 };
 
 
 typedef uint32_t (*FjBackendInitializer) (
-    struct FjBackendInitContext *initCtx
+    struct FjBackendParams *initCtx
 );
 
 
@@ -88,7 +88,7 @@ void fjInstanceDestroy(
 );
 
 uint32_t fjBackendInit(
-    struct FjBackendInitContext *ctx
+    struct FjBackendParams *ctx
 );
 
 uint32_t fjIntanceInitWindow(

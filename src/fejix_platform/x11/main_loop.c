@@ -1,7 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <platform/x11/window_utils.h>
-// #include <draw/draw.h>
+#include <fejix_platform/x11/window_utils.h>
 
 #include <malloc.h>
 
@@ -30,7 +29,7 @@ void fjLoop(
     FjEventHandler handle
 )
 {
-    struct _FjBackend *backend = &inst->backend;
+    struct FjBackendInstanceContext *backend = &inst->instanceContext;
 
     for (;;)
     {

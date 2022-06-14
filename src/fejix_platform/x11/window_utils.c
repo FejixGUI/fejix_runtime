@@ -1,7 +1,7 @@
 #include <fejix_runtime/fejix.h>
 
 #include <fejix_private.h>
-#include <platform/x11/window_utils.h>
+#include <fejix_platform/x11/window_utils.h>
 
 void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
 {

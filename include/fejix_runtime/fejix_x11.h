@@ -12,8 +12,8 @@
 #ifdef FJ_USE_OPENGL3
 #   include <glad/glx.h>
 
-// We are going to include <glad/gl.h> to load OpenGL
-// If we included <GL/glx.h> it would include <GL/gl.h>
+// We are going to include <glad/gl.h> to load OpenGL.
+// If we included <GL/glx.h> it, would include <GL/gl.h>
 // which is incompatible with <glad/gl.h> 
 // #   include <GL/glx.h>   // <-- So, we do not use this
 #endif
@@ -26,7 +26,7 @@ struct FjInstance {
     struct FjWindow **windows;
     uint32_t windowsLen;
 
-    struct _FjBackend backend;
+    struct FjBackendInstanceContext instanceContext;
 
     // Xlib stuff
     Display *xDisplay;
@@ -46,21 +46,22 @@ struct FjInstance {
     xcb_visualid_t windowVisualId;
     xcb_colormap_t colormapId;
 
-
-#ifdef FJ_USE_OPENGL3
-    GLXFBConfig gl3_framebufferConfig;
-#endif
-
 };
 
 
 struct FjWindow {
+    /// @defgroup generic Generic fields
+    /// @{
     struct FjInstance *instance;
     struct FjWidget *root;
     void *data;
 
     uint32_t width;
     uint32_t height;
+
+    FjBackendWindowContext *windowContext;
+    FjBackendDrawContext *drawContext;
+    /// @}
 
     xcb_window_t windowId;
 
@@ -72,11 +73,6 @@ struct FjWindow {
     /// Thanks to Qt's devs!
     xcb_sync_counter_t syncCounter;
     xcb_sync_int64_t syncValue;
-
-#ifdef FJ_USE_OPENGL3
-    GLXWindow glxwin;
-    GLXContext glctx;
-#endif
 };
 
 

@@ -15,7 +15,7 @@
 #define arrlen(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
 
 
-uint32_t initBackend(FjBackendInitContext *ctx)
+uint32_t initBackend(FjBackendParams *ctx)
 {
     ctx->backend = FJ_BACKEND_OPENGL3;
 

@@ -9,7 +9,7 @@
 
 #ifdef _FEJIX_H_
     _ALIAS(FjInstance);
-    _ALIAS(FjBackendInitContext);
+    _ALIAS(FjBackendParams);
     _ALIAS(FjWindow);
     _ALIAS(FjWindowParams);
     _ALIAS(FjEvent);

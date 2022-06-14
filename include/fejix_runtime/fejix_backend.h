@@ -9,41 +9,53 @@
 #define _FEJIX_BACKEND_H_
 
 
-#include <fejix_runtime/fejix.h>
+typedef void FjBackendInstanceData;
+typedef void FjBackendWindowContext;
+typedef void FjBackendDrawContext;
 
 
-struct _FjBackend {
+struct FjBackendParams;
+struct FjInstance;
+struct FjWindow;
+
+
+struct FjBackendInstanceContext {
     struct FjInstance *instance;
-    void *data;
+    FjBackendInstanceData *instanceData;
 
-    uint32_t id;
+    uint32_t backendId;
 
     void (*destroy)(
-        struct _FjBackend *self
+        struct FjBackendInstanceContext *self
     );
 
     uint32_t (*initWindow)(
-        struct _FjBackend *self,
+        struct FjBackendInstanceContext *self,
         struct FjWindow *win
     ); 
 
     void (*destroyWindow)(
-        struct _FjBackend *self,
+        struct FjBackendInstanceContext *self,
         struct FjWindow *win
     ); 
 
     uint32_t (*draw)(
-        struct _FjBackend *self,
+        struct FjBackendInstanceContext *self,
         struct FjWindow *win,
         uint32_t width,
         uint32_t height
     );
 
     uint32_t (*present)(
-        struct _FjBackend *self,
+        struct FjBackendInstanceContext *self,
         struct FjWindow *win
     );
 };
+
+
+#ifdef FJ_USE_OPENGL3
+    uint32_t _fjBackendInitInstance_opengl3(struct FjBackendParams *ctx); 
+#endif
 
 
 

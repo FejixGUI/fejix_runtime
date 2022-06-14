@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-uint32_t _fjBackendInit_gl3(struct FjBackendInitContext *ctx)
+uint32_t _fjBackendInit_gl3(struct FjBackendParams *ctx)
 {
     ctx->instance->backend = FJ_BACKEND_OPENGL3;
     return FJ_OK;
