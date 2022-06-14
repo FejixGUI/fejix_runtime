@@ -49,7 +49,7 @@ for line in src.splitlines():
         dst.write(';\n\n')
 
     else:
-        dst.write('   "%s"\n' % line)
+        dst.write('   "%s\\n"\n' % line)
 
 dst.close()
 print('Wrote to', dst_name)
