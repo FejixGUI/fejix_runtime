@@ -30,3 +30,12 @@ cmake --build build
 * `libx11-xcb-dev`
 * `libxcb-sync-dev`
 * `libxcb-icccm4-dev`
+
+
+### Additional steps
+
+In order to convert `.glsl` shaders to `.c` files (simply generate C strings)
+you need to run:
+```
+./tools/proc-opengl3.sh
+```

@@ -126,6 +126,7 @@ uint32_t initWindow(
     struct FjInstance *instance;
     struct FjBackendInstanceData_opengl3 *instanceData;
     struct FjBackendWindowContext_opengl3 *windowContext;
+    struct FjBackendDrawContext_opengl3 *drawContext;
 
     instance = win->instance;
     instanceData = instanceContext->instanceData;
@@ -134,7 +135,14 @@ uint32_t initWindow(
     if (!windowContext)
         return FJ_ERR_MALLOC_FAIL;
 
+    drawContext = malloc(sizeof(*drawContext));
+    if (!drawContext) {
+        free(windowContext);
+        return FJ_ERR_MALLOC_FAIL;
+    }
+
     win->windowContext = windowContext;
+    win->drawContext = drawContext;
 
     windowContext->glctx = glXCreateNewContext(
         instance->xDisplay,
@@ -144,8 +152,11 @@ uint32_t initWindow(
         True
     );
 
-    if (!windowContext->glctx)
+    if (!windowContext->glctx) {
+        free(windowContext);
+        free(drawContext);
         return FJ_ERR_BACKEND_FAIL;
+    }
 
 
     windowContext->glxwin = glXCreateWindow(
@@ -157,26 +168,31 @@ uint32_t initWindow(
 
     if (!windowContext->glxwin) {
         glXDestroyContext(instance->xDisplay, windowContext->glctx);
-
+        free(windowContext);
+        free(drawContext);
         return FJ_ERR_BACKEND_FAIL;
     }
 
-    if (glClear == NULL) {
-        glXMakeContextCurrent(
-            instance->xDisplay,
-            windowContext->glxwin,
-            windowContext->glxwin,
-            windowContext->glctx
-        );
+    glXMakeContextCurrent(
+        instance->xDisplay,
+        windowContext->glxwin,
+        windowContext->glxwin,
+        windowContext->glctx
+    );
 
+    if (glClear == NULL) {
         if (!gladLoaderLoadGL()) {
             glXDestroyContext(instance->xDisplay, windowContext->glctx);
             glXDestroyWindow(instance->xDisplay, windowContext->glxwin);
+            free(drawContext);
+            free(windowContext);
+            win->windowContext = NULL;
+            win->drawContext = NULL;
             return FJ_ERR_WMAPI_FAIL;
         }
     }
 
-    return FJ_OK;    
+    return _fjDrawContextInit_opengl3(drawContext);
 }
 
 
@@ -186,11 +202,17 @@ void destroyWindow(
 )
 {
     struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
+    struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
 
     if (windowContext) {
         glXDestroyWindow(win->instance->xDisplay, windowContext->glxwin);
         glXDestroyContext(win->instance->xDisplay, windowContext->glctx);
         free(windowContext);
+    }
+
+    if (drawContext) {
+        _fjDrawContextDestroy_opengl3(drawContext);
+        free(drawContext);
     }
 }
 
@@ -215,7 +237,7 @@ uint32_t draw(
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    // _fjBackendDrawSomething_gl3();
+    _fjDraw_opengl3(win->drawContext);
 
     glXMakeContextCurrent(
         win->instance->xDisplay,

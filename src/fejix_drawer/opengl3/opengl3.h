@@ -12,9 +12,9 @@ struct FjBackendDrawContext_opengl3 {
     GLuint shapeVAO;
 };
 
-uint32_t _fjOpengl3InitContext(struct FjBackendDrawContext_opengl3 *ctx);
-void _fjOpengl3DestroyContext(struct FjBackendDrawContext_opengl3 *ctx);
-void _fjOpengl3Draw(struct FjBackendDrawContext_opengl3 *ctx);
+uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx);
+void _fjDrawContextDestroy_opengl3(struct FjBackendDrawContext_opengl3 *ctx);
+void _fjDraw_opengl3(struct FjBackendDrawContext_opengl3 *ctx);
 
 
 #endif // _FEJIX_DRAWER_OPENGL3_H_
