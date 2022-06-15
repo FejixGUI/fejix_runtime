@@ -11,9 +11,12 @@ struct FjBackendDrawContext_opengl3 {
     uint32_t height;
 
     GLuint program;
+    GLuint u_screenSize;
+
     GLuint shapeVBO;
     GLuint shapeVAO;
-    GLuint u_screenSize;
+    GLuint fillVBO;
+    GLuint fillVAO;
 };
 
 uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx);

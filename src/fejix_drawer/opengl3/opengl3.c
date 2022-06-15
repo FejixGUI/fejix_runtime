@@ -9,20 +9,34 @@
 #include <stdio.h>
 
 
-static GLfloat
-verteces[] = {
-    10.f,   10.f,
-    100.f,  10.f,
-    10.f,   590.f,
-    200.f,  590.f
-    /* -0.5f, 0.5f,
-    0.5f, 0.5f,
-    -0.5f, -0.5f,
-    0.5f, -0.5f */
-    /* -1.f, 1.f,
-    1.f, 1.f,
-    -1.f, -1.f,
-    1.f, -1.f */
+static GLfloat shape[] = {
+    40,100,
+    60,80,
+    100,60,
+    160,80,
+    200,120,
+    240,100,
+    260,40,
+    300,20,
+    320,80,
+    280,140,
+    240,200,
+    200,220,
+    160,200,
+    100,160,
+    60,160,
+    80,240,
+    40,200,
+    20,140
+};
+
+
+
+static GLfloat verteces[] = {
+    0.f,   0.f,
+    400.f, 0.f,
+    0.f,   500.f,
+    400.f, 500.f
 };
 
 
@@ -51,14 +65,14 @@ static void _debug(int line) {
 #define DBG _debug(__LINE__);
 
 
-uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
+static GLuint makeProgram(const char *vertexSrc, const char *fragmentSrc)
 {
     GLuint vertexShader, fragmentShader, program;
     GLint success;
     char log[512];
 
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &_vertexShader, NULL);
+    glShaderSource(vertexShader, 1, &vertexSrc, NULL);
     glCompileShader(vertexShader);
     glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
     if (!success) {
@@ -68,7 +82,7 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     }
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &_fragmentShader, NULL);
+    glShaderSource(fragmentShader, 1, &fragmentSrc, NULL);
     glCompileShader(fragmentShader);
     glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
     if (!success) {
@@ -87,13 +101,47 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
         puts(log);
         return FJ_ERR_BACKEND_FAILED;
     }
-    glValidateProgram(program);
 
-    ctx->program = program;
+    glValidateProgram(program);
+    glGetProgramiv(program, GL_VALIDATE_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(program, STATIC_LEN(log), NULL, log);
+        puts(log);
+    }
 
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
 
+    return program;
+}
+
+
+
+uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
+{
+    ctx->program = makeProgram(_vertexShader, _fragmentShader);
+
+    glGenVertexArrays(1, &ctx->fillVAO);
+    glBindVertexArray(ctx->fillVAO);
+
+    glEnableVertexAttribArray(0);
+    glGenBuffers(1, &ctx->fillVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->fillVBO);
+    glBufferData(
+        GL_ARRAY_BUFFER,
+        SIZEOF_BITS(verteces),
+        verteces,
+        GL_STATIC_DRAW
+    );
+    glVertexAttribPointer(
+        0, 2,
+        GL_FLOAT,
+        GL_FALSE,
+        0,
+        NULL
+    );
+    glDisableVertexAttribArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glGenVertexArrays(1, &ctx->shapeVAO);
     glBindVertexArray(ctx->shapeVAO);
@@ -102,13 +150,12 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     glBindBuffer(GL_ARRAY_BUFFER, ctx->shapeVBO);
     glBufferData(
         GL_ARRAY_BUFFER,
-        8 * sizeof(verteces),
-        verteces,
+        SIZEOF_BITS(shape),
+        shape,
         GL_STATIC_DRAW
     );
-
     glEnableVertexAttribArray(0);
-
+    glBindBuffer(GL_ARRAY_BUFFER, ctx->shapeVBO);
     glVertexAttribPointer(
         0, 2,
         GL_FLOAT,
@@ -116,7 +163,6 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
         0,
         NULL
     );
-
     glDisableVertexAttribArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
@@ -132,15 +178,18 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 void _fjDrawContextDestroy_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 {
     glDeleteProgram(ctx->program);
-    glDeleteVertexArrays(1, &ctx->shapeVAO);
+    glDeleteVertexArrays(1, &ctx->fillVAO);
     glDeleteBuffers(1, &ctx->shapeVBO);
+    glDeleteBuffers(1, &ctx->fillVBO);
 }
 
 
 void _fjDraw_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 {
     glViewport(0, 0, ctx->width, ctx->height);
+
     glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClearStencil(0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
     glUseProgram(ctx->program);
@@ -149,8 +198,24 @@ void _fjDraw_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 
     glBindVertexArray(ctx->shapeVAO);
     glEnableVertexAttribArray(0);
+    glEnable(GL_STENCIL_TEST);
+    glDisable(GL_DEPTH_TEST);
+    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+    glStencilFunc(GL_NEVER, 0, 0xFF);
+    glStencilOp(GL_INVERT, GL_KEEP, GL_KEEP);
+    glDrawArrays(GL_TRIANGLE_FAN, 0, STATIC_LEN(shape)/2);
+    glDisableVertexAttribArray(0);
+
+    glBindVertexArray(ctx->fillVAO);
+    glEnableVertexAttribArray(0);
+    glEnable(GL_STENCIL_TEST);
+    glStencilFunc(GL_NOTEQUAL, 0, 0xFF);
+    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(0);
+
     glBindVertexArray(0);
-    // glUseProgram(0);
+    
+    glUseProgram(0);
 }
