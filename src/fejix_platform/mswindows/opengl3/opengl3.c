@@ -35,7 +35,7 @@ uint32_t _fjBackendInitWindow_gl3(struct FjWindow *win)
     win->glctx = wglCreateContext(hdc);
 
     if (!win->glctx)
-        return FJ_ERR_WMAPI_FAIL;
+        return FJ_ERR_WMAPI_FAILED;
 
     if (glClear == NULL) {
         wglMakeCurrent(hdc, win->glctx);
@@ -77,7 +77,7 @@ void _fjDrawEnd_gl3(struct FjWindow *win)
 uint32_t _fjDrawPresent_gl3(struct FjWindow *win)
 {
     if (!SwapBuffers(win->hDC))
-        return FJ_ERR_WMAPI_FAIL;
+        return FJ_ERR_WMAPI_FAILED;
 
     return FJ_OK;
 }

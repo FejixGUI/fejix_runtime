@@ -34,12 +34,12 @@ uint32_t _fjBackendInitInstance_opengl3(struct FjBackendParams *ctx)
 
     instanceData = malloc(sizeof(*instanceData));
     if (!instanceData)
-        return FJ_ERR_MALLOC_FAIL;
+        return FJ_ERR_MALLOC_FAILED;
 
     instanceContext->instanceData = instanceData;
 
     if (!gladLoaderLoadGLX(instance->xDisplay, instance->xDefaultScreen))
-        return FJ_ERR_WMAPI_FAIL;
+        return FJ_ERR_WMAPI_FAILED;
 
     // Don't even think about initializing OpenGL without an existing context!
     /* if (!gladLoaderLoadGL())
@@ -133,12 +133,12 @@ uint32_t initWindow(
 
     windowContext = malloc(sizeof(*windowContext));
     if (!windowContext)
-        return FJ_ERR_MALLOC_FAIL;
+        return FJ_ERR_MALLOC_FAILED;
 
     drawContext = malloc(sizeof(*drawContext));
     if (!drawContext) {
         free(windowContext);
-        return FJ_ERR_MALLOC_FAIL;
+        return FJ_ERR_MALLOC_FAILED;
     }
 
     win->windowContext = windowContext;
@@ -155,7 +155,7 @@ uint32_t initWindow(
     if (!windowContext->glctx) {
         free(windowContext);
         free(drawContext);
-        return FJ_ERR_BACKEND_FAIL;
+        return FJ_ERR_BACKEND_FAILED;
     }
 
 
@@ -170,7 +170,7 @@ uint32_t initWindow(
         glXDestroyContext(instance->xDisplay, windowContext->glctx);
         free(windowContext);
         free(drawContext);
-        return FJ_ERR_BACKEND_FAIL;
+        return FJ_ERR_BACKEND_FAILED;
     }
 
     glXMakeContextCurrent(
@@ -188,7 +188,7 @@ uint32_t initWindow(
             free(windowContext);
             win->windowContext = NULL;
             win->drawContext = NULL;
-            return FJ_ERR_WMAPI_FAIL;
+            return FJ_ERR_WMAPI_FAILED;
         }
     }
 
@@ -225,6 +225,7 @@ uint32_t draw(
 )
 {
     struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
+    struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
 
     glXMakeContextCurrent(
         win->instance->xDisplay,
@@ -233,16 +234,15 @@ uint32_t draw(
         windowContext->glctx
     );
 
-    glViewport(0, 0, W, H);
-    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT);
+    drawContext->width = W;
+    drawContext->height = H;
 
     _fjDraw_opengl3(win->drawContext);
 
-    glXMakeContextCurrent(
-        win->instance->xDisplay,
-        0, 0, 0
-    );
+    // glXMakeContextCurrent(
+    //     win->instance->xDisplay,
+    //     0, 0, 0
+    // );
 
     return FJ_OK;
 }
@@ -264,10 +264,10 @@ uint32_t present(
 
     glXSwapBuffers(win->instance->xDisplay, windowContext->glxwin);
 
-    glXMakeContextCurrent(
-        win->instance->xDisplay,
-        0, 0, 0
-    );
+    // glXMakeContextCurrent(
+    //     win->instance->xDisplay,
+    //     0, 0, 0
+    // );
 
     return FJ_OK;
 }

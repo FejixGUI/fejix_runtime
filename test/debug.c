@@ -12,7 +12,7 @@ void checkFj(const char *file, int line, int value)
     case FJ_OK:
         return;
     
-    case FJ_ERR_BACKEND_FAIL:
+    case FJ_ERR_BACKEND_FAILED:
         out("Backend error");
         break;
 
@@ -28,11 +28,11 @@ void checkFj(const char *file, int line, int value)
         out("Invalid function parameter");
         break;
 
-    case FJ_ERR_MALLOC_FAIL:
+    case FJ_ERR_MALLOC_FAILED:
         out("Out of memory (malloc failed)");
         break;
 
-    case FJ_ERR_WMAPI_FAIL:
+    case FJ_ERR_WMAPI_FAILED:
         out("Window manager API failed");
         break;
 

@@ -11,10 +11,18 @@
 
 static GLfloat
 verteces[] = {
-    0.f, 0.f,
-    1.f, 0.f,
-    0.f, 1.f,
-    1.f, 1.f
+    10.f,   10.f,
+    100.f,  10.f,
+    10.f,   590.f,
+    200.f,  590.f
+    /* -0.5f, 0.5f,
+    0.5f, 0.5f,
+    -0.5f, -0.5f,
+    0.5f, -0.5f */
+    /* -1.f, 1.f,
+    1.f, 1.f,
+    -1.f, -1.f,
+    1.f, -1.f */
 };
 
 
@@ -56,7 +64,7 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     if (!success) {
         glGetShaderInfoLog(vertexShader, STATIC_LEN(log), NULL, log);
         puts(log);
-        return FJ_ERR_BACKEND_FAIL;
+        return FJ_ERR_BACKEND_FAILED;
     }
 
     fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
@@ -66,7 +74,7 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     if (!success) {
         glGetShaderInfoLog(fragmentShader, STATIC_LEN(log), NULL, log);
         puts(log);
-        return FJ_ERR_BACKEND_FAIL;
+        return FJ_ERR_BACKEND_FAILED;
     }
 
     program = glCreateProgram();
@@ -77,8 +85,9 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     if (!success) {
         glGetProgramInfoLog(program, STATIC_LEN(log), NULL, log);
         puts(log);
-        return FJ_ERR_BACKEND_FAIL;
+        return FJ_ERR_BACKEND_FAILED;
     }
+    glValidateProgram(program);
 
     ctx->program = program;
 
@@ -112,23 +121,36 @@ uint32_t _fjDrawContextInit_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    // glUseProgram(ctx->program);
+    ctx->u_screenSize = glGetUniformLocation(ctx->program, "u_screenSize");
+    // glUseProgram(0);
+
     return FJ_OK;
 }
 
 
 void _fjDrawContextDestroy_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 {
-
+    glDeleteProgram(ctx->program);
+    glDeleteVertexArrays(1, &ctx->shapeVAO);
+    glDeleteBuffers(1, &ctx->shapeVBO);
 }
 
 
 void _fjDraw_opengl3(struct FjBackendDrawContext_opengl3 *ctx)
 {
+    glViewport(0, 0, ctx->width, ctx->height);
+    glClearColor(0.5f, 0.5f, 0.5f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+
     glUseProgram(ctx->program);
+
+    glUniform2f(ctx->u_screenSize, (float)ctx->width, (float)ctx->height);
+
     glBindVertexArray(ctx->shapeVAO);
     glEnableVertexAttribArray(0);
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     glDisableVertexAttribArray(0);
     glBindVertexArray(0);
-    glUseProgram(0);
+    // glUseProgram(0);
 }

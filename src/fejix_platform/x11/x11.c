@@ -31,7 +31,7 @@ static uint32_t getAtoms(
         reply = xcb_intern_atom_reply(con, coockies[i], &error);
 
         if (error != NULL) {
-            return FJ_ERR_WMAPI_FAIL;
+            return FJ_ERR_WMAPI_FAILED;
         }
 
         atoms[i] = reply->atom;
@@ -50,14 +50,14 @@ uint32_t fjInstanceInit(struct FjInstance *inst, FjBackendInitializer init)
     inst->xDisplay = XOpenDisplay(NULL);
 
     if (!inst->xDisplay)
-        return FJ_ERR_WMAPI_FAIL;
+        return FJ_ERR_WMAPI_FAILED;
 
     inst->xDefaultScreen = XDefaultScreen(inst->xDisplay);
 
     inst->connection = XGetXCBConnection(inst->xDisplay);
     if (!inst->connection) {
         XCloseDisplay(inst->xDisplay);
-        return FJ_ERR_WMAPI_FAIL;
+        return FJ_ERR_WMAPI_FAILED;
     }
 
     XSetEventQueueOwner(inst->xDisplay, XCBOwnsEventQueue);

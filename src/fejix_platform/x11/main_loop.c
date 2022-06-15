@@ -50,9 +50,13 @@ void fjLoop(
                 win = findWindowById(inst, exposeEvent->window);
                 if (!win) break;
 
-                _fjWindowIncrSyncCounter(win);
-                backend->present(backend, win);
-                _fjWindowIncrSyncCounter(win);
+                // if (exposeEvent->count == 0) {
+                    backend->draw(backend, win, win->width, win->height);
+
+                    _fjWindowIncrSyncCounter(win);
+                    backend->present(backend, win);
+                    _fjWindowIncrSyncCounter(win);
+                // }
             }
             break;
 
@@ -65,7 +69,6 @@ void fjLoop(
                 uint32_t W = configEvent->width;
                 uint32_t H = configEvent->height;
 
-                backend->draw(backend, win, win->width, win->height);
 
                 if (win->width != W || win->height != H) {
                     win->width = W;

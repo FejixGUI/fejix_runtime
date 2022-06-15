@@ -13,9 +13,9 @@
 
 // Error codes
 #define FJ_OK                       0
-#define FJ_ERR_MALLOC_FAIL          1
-#define FJ_ERR_WMAPI_FAIL           2
-#define FJ_ERR_BACKEND_FAIL         3
+#define FJ_ERR_MALLOC_FAILED        1
+#define FJ_ERR_WMAPI_FAILED         2
+#define FJ_ERR_BACKEND_FAILED       3
 #define FJ_ERR_BACKEND_UNKNOWN      4
 #define FJ_ERR_INVALID_PARAM        5
 #define FJ_ERR_INVALID_ENCODING     6
