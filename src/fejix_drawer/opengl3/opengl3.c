@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private.h>
+#include <fejix_private_defines.h>
 #include <fejix_drawer/opengl3/opengl3.h>
 
 #include <fejix_drawer/opengl3/shaders.c>

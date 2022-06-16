@@ -1,7 +1,11 @@
 #ifndef _FEJIX_PRIVATE_H_
 #define _FEJIX_PRIVATE_H_
 
-#define STATIC_LEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
-#define SIZEOF_BITS(OBJECT) (sizeof(OBJECT) * 8)
+#include <fejix_runtime/fejix_defines.h>
+
+struct FjWidget;
+
+void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH);
+
 
 #endif // _FEJIX_PRIVATE_H_

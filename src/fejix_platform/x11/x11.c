@@ -2,7 +2,7 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/fejix_backend.h>
 
-#include <fejix_private.h>
+#include <fejix_private_defines.h>
 #include <fejix_platform/x11/window_utils.h>
 
 #include <string.h>

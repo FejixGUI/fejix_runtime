@@ -26,6 +26,7 @@
 #define FJ_BACKEND_OPENGL3      1
 
 
+struct FjWidget;
 struct FjWindow;
 struct FjInstance;
 
@@ -33,6 +34,15 @@ typedef uint32_t (*FjEventHandler)(
     struct FjWindow *win,
     struct FjEvent *ev
 );
+
+typedef void (*FjLayoutFn) (
+    struct FjWidget *self,
+    uint32_t mode
+);
+
+#define FJ_LAYOUT_MIN   0
+#define FJ_LAYOUT_MAX   1
+#define FJ_LAYOUT_EXACT 2
 
 
 #endif // _FEJIX_DEFINES_H_

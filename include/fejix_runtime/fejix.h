@@ -22,10 +22,6 @@
 #   include <fejix_runtime/fejix_x11.h>
 #endif
 
-#ifdef FJ_USE_OPENGL3
-#   include <glad/gl.h>
-#endif
-
 
 
 struct FjBackendParams {
@@ -171,7 +167,7 @@ struct FjWidget {
     uint32_t _contentIndex;     // Used during layout traversal
 
     // Functions
-    // FjLayoutFn layout;
+    FjLayoutFn layout;
     // FjDrawFn draw;
     // FjCursorHandlerFn handle;
 };

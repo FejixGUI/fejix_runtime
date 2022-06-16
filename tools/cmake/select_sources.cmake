@@ -1,7 +1,7 @@
 target_sources(fejix_runtime
     PRIVATE
     "${SRC}/src/fejix_generic.c"
-    "${SRC}/src/fejix_platform/backend.c"
+    "${SRC}/src/fejix_private.c"
 )
 
 target_include_directories(
