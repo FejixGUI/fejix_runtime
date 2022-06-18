@@ -18,10 +18,10 @@ target_include_directories(
     "${SRC}/src"
 )
 
-if (FEJIX_USE_OPENGL3)
+if (FEJIX_USE_NANOVG)
     target_sources(
         fejix_runtime PRIVATE
-        "${SRC}/src/fejix_drawer/opengl3/opengl3.c"
+        "${SRC}/src/fejix_drawer/nanovg/nanovg.c"
     )
 endif()
 

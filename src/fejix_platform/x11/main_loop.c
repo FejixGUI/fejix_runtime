@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private.h>
+#include <fejix_layout.h>
 #include <fejix_platform/x11/window_utils.h>
 
 #include <malloc.h>

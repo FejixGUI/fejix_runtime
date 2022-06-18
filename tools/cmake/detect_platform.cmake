@@ -34,10 +34,35 @@ else()
 endif()
 
 
-option(FEJIX_USE_OPENGL3 "Use OpenGL 3" ON)
+# option(FEJIX_USE_OWN_RENDERER "Use Fejix's own renderer" OFF)
+option(FEJIX_USE_NANOVG "Use NanoVG for rendering" ON)
+option(FEJIX_USE_OPENGL3 "Use OpenGL3 for whatever renderer selected" ON)
+
+# if(FEJIX_USE_FEJIX_OPENGL3)
+#     target_compile_definitions(
+#         fejix_runtime
+#         PUBLIC
+#         "FJ_USE_FEJIX_OPENGL3"
+#         "FJ_USE_OPENGL3"
+#     )
+#     set(FEJIX_USE_OPENGL3 ON)
+
+if(FEJIX_USE_NANOVG)
+    target_compile_definitions(
+        fejix_runtime
+        PUBLIC 
+        "FJ_USE_NANOVG"
+    )
+endif()
 
 if(FEJIX_USE_OPENGL3)
-    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_OPENGL3")
-else()
+    target_compile_definitions(
+        fejix_runtime
+        PUBLIC 
+        "FJ_USE_OPENGL3"
+    )
+endif()
+
+if(NOT FEJIX_USE_NANOVG OR NOT FEJIX_USE_OPENGL3)
     message(FATAL_ERROR "No drawing backend is selected. Plase, select one.")
 endif()

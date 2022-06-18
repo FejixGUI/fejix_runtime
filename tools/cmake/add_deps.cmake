@@ -1,5 +1,11 @@
+target_link_libraries(
+    fejix_runtime
+    "m" # <math.h>
+)
+
 if(FEJIX_USE_X11)
-    target_link_libraries(fejix_runtime
+    target_link_libraries(
+        fejix_runtime
         "X11"
         "X11-xcb"
         "xcb"
@@ -20,4 +26,8 @@ if(FEJIX_USE_OPENGL3)
     if(FEJIX_USE_WINAPI)
         target_link_libraries(fejix_runtime "opengl32")
     endif()
+endif()
+
+if(FEJIX_USE_NANOVG)
+    include("${SRC}/tools/cmake/build_3dparty/nanovg.cmake")
 endif()

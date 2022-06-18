@@ -1,7 +1,15 @@
 #include <fejix_runtime/fejix.h>
 
 #include <fejix_platform/x11/opengl3/opengl3.h>
-#include <fejix_drawer/opengl3/opengl3.h>
+
+#if 0
+// TODO FUTURE Fejix's own renderer
+#   include <fejix_drawer/opengl3/opengl3.h>
+#endif
+
+#ifdef FJ_USE_NANOVG
+#   include <fejix_drawer/nanovg/nanovg.h>
+#endif
 
 #include <malloc.h>
 
@@ -13,13 +21,13 @@ static uint32_t initWindow(
     struct FjBackendInstanceContext *, struct FjWindow *
 ); 
 static void destroyWindow(
-    struct FjBackendInstanceContext *, struct FjWindow *win
+    struct FjBackendInstanceContext *, struct FjWindow *
 ); 
 static uint32_t draw(
     struct FjBackendInstanceContext *, struct FjWindow *, uint32_t W, uint32_t H
 );
 static uint32_t present(
-    struct FjBackendInstanceContext *, struct FjWindow *win
+    struct FjBackendInstanceContext *, struct FjWindow *
 );
 
 
@@ -126,7 +134,10 @@ uint32_t initWindow(
     struct FjInstance *instance;
     struct FjBackendInstanceData_opengl3 *instanceData;
     struct FjBackendWindowContext_opengl3 *windowContext;
-    struct FjBackendDrawContext_opengl3 *drawContext;
+    // struct FjBackendDrawContext_opengl3 *drawContext;
+#ifdef FJ_USE_NANOVG
+    struct FjDrawContext_nanovg *drawContext;
+#endif
 
     instance = win->instance;
     instanceData = instanceContext->instanceData;
@@ -192,7 +203,8 @@ uint32_t initWindow(
         }
     }
 
-    return _fjDrawContextInit_opengl3(drawContext);
+    // return _fjDrawContextInit_opengl3(drawContext);
+    return _fjDrawContextInit_nanovg(drawContext);
 }
 
 
@@ -202,7 +214,10 @@ void destroyWindow(
 )
 {
     struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
-    struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
+
+#ifdef FJ_USE_NANOVG
+    struct FjDrawContext_nanovg *drawContext = win->drawContext;
+#endif
 
     if (windowContext) {
         glXDestroyWindow(win->instance->xDisplay, windowContext->glxwin);
@@ -211,7 +226,10 @@ void destroyWindow(
     }
 
     if (drawContext) {
-        _fjDrawContextDestroy_opengl3(drawContext);
+        // _fjDrawContextDestroy_opengl3(drawContext);
+#ifdef FJ_USE_NANOVG
+        _fjDrawContextDestroy_nanovg(drawContext);
+#endif
         free(drawContext);
     }
 }
@@ -225,7 +243,10 @@ uint32_t draw(
 )
 {
     struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
-    struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
+    // struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
+#ifdef FJ_USE_NANOVG
+    struct FjDrawContext_nanovg *drawContext = win->drawContext;
+#endif
 
     glXMakeContextCurrent(
         win->instance->xDisplay,
@@ -237,7 +258,8 @@ uint32_t draw(
     drawContext->width = W;
     drawContext->height = H;
 
-    _fjDraw_opengl3(win->drawContext);
+    // _fjDraw_opengl3(win->drawContext);
+    _fjDraw_nanovg(drawContext);
 
     // glXMakeContextCurrent(
     //     win->instance->xDisplay,
