@@ -52,7 +52,7 @@ void fjLoop(
                 if (!win) break;
 
                 // if (exposeEvent->count == 0) {
-                fjLayout(win->root, win->width, win->height);
+                _fjLayout(win->root, win->width, win->height);
                 backend->draw(backend, win, win->width, win->height);
 
                 _fjWindowIncrSyncCounter(win);

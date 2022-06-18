@@ -40,9 +40,23 @@ typedef void (*FjLayoutFn) (
     uint32_t mode
 );
 
-#define FJ_LAYOUT_MIN   0
-#define FJ_LAYOUT_MAX   1
+#define FJ_LAYOUT_MAX   0
+#define FJ_LAYOUT_MIN   1
 #define FJ_LAYOUT_EXACT 2
 
+struct FjXY {
+    int32_t x;
+    int32_t y;
+};
+
+struct FjXY2 {
+    int32_t x1;
+    int32_t y1;
+    int32_t x2;
+    int32_t y2;
+};
+
+/// The value that should be used for W/H of infinitely big widgets
+#define FJ_EXPAND INT32_MAX
 
 #endif // _FEJIX_DEFINES_H_

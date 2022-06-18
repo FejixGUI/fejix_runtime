@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private.h>
+#include <fejix_layout.h>
 
 
 #define L(w) (w)->contentLength
@@ -55,14 +55,16 @@ static void _defaultLayout(struct FjWidget *self, uint32_t mode)
  * Assumptions:
  * 1. Root widget has NULL container
  * 2. Every layout() method handles the situation when a widget has no content
- * 3. layout() method of the root widget sets X/Y to 0 and receives W/H from
- *    _geometry.x/y2
+ * 3. layout() method of the root widget:
+ *    - sets its own X/Y to 0
+ *    - receives W/H from _geometry.x/y2
+ *    - sets its own exact W/H
  * 4. All widgets reference their container
  * 5. All widgets' content elements are non-NULL
  * 6. If a widget has no layout() method, the _defaultLayout() is used
  *    P.S. Never leave your layout() method empty!
  */
-void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
+void _fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
 {
     struct FjWidget *wgt = root;
 
@@ -70,6 +72,8 @@ void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
         return;
 
     I(wgt) = 0;
+    wgt->_geometry.x2 = windowW;
+    wgt->_geometry.y2 = windowH;
 
     // Perform 2 depth-first traversals
 
@@ -102,9 +106,6 @@ void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
     }
 
     wgt = root;
-
-    wgt->_geometry.x2 = windowW;
-    wgt->_geometry.y2 = windowH;
 
     // 2nd traversal - exact sizes and positions
     while (1)

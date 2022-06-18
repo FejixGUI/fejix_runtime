@@ -1,3 +1,13 @@
+## Temporarily abandoned in favour of the Rust programming language and its numerous ready libraries
+
+I am switching to Rust in order to get a working prototype as soon as possible.
+
+After I settle down my imagination, ideas and ambitions, I will continue to
+develop this C library.
+
+Please, note that the progress I made is not lost. It will just be translated
+to Rust.
+
 # 🛠️ Fejix Runtime 🛠️
 
 > Work in progress ⌛...
