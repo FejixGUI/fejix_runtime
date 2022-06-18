@@ -1,4 +1,4 @@
-## Temporarily abandoned in favour of the Rust programming language and its numerous ready libraries
+## Temporarily abandoned in favor of the Rust programming language and its numerous ready libraries
 
 I am switching to Rust in order to get a working prototype as soon as possible.
 
