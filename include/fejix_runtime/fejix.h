@@ -14,12 +14,12 @@
 #endif
 
 
-#include <fejix_runtime/fejix_defines.h>
+#include <fejix_runtime/defines.h>
 
 #ifdef FJ_USE_WINAPI
-#   include <fejix_runtime/fejix_winapi.h>
+#   include <fejix_runtime/internal/winapi.h>
 #elif FJ_USE_X11
-#   include <fejix_runtime/fejix_x11.h>
+#   include <fejix_runtime/internal/x11.h>
 #endif
 
 
@@ -148,9 +148,10 @@ struct FjWidget {
 
     void *data;                 // Widget's local data
 
-    struct FjXY2 constraints;   // Min/Max sizes
-    struct FjXY  weights;       // Size coefficients
-    struct FjXY2 _geometry;     // Variable set of coordinates 
+    struct FjConstraints constraints;     // Min/Max sizes
+    struct FjConstraints _tmpConstraints; // For layout calculation
+    struct FjGeometry _geometry;          // X/Y/W/H
+    struct FjXY weights;                  // Growing coefficients
 
     uint32_t contentLength;     // Number of children
     uint32_t _contentIndex;     // Used during layout traversal

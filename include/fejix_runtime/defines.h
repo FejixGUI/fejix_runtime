@@ -1,7 +1,7 @@
 #ifndef _FEJIX_DEFINES_H_
 #define _FEJIX_DEFINES_H_
 
-#include <fejix_runtime/fejix_events.h>
+#include <fejix_runtime/events.h>
 
 #include <stdint.h>
 
@@ -44,16 +44,23 @@ typedef void (*FjLayoutFn) (
 #define FJ_LAYOUT_MIN   1
 #define FJ_LAYOUT_EXACT 2
 
+struct FjConstraints {
+    int32_t minW;
+    int32_t minH;
+    int32_t maxW;
+    int32_t maxH;
+};
+
+struct FjGeometry {
+    int32_t x;
+    int32_t y;
+    int32_t w;
+    int32_t h;
+};
+
 struct FjXY {
     int32_t x;
     int32_t y;
-};
-
-struct FjXY2 {
-    int32_t x1;
-    int32_t y1;
-    int32_t x2;
-    int32_t y2;
 };
 
 /// The value that should be used for W/H of infinitely big widgets

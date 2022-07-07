@@ -11,7 +11,7 @@
 
 typedef void FjBackendInstanceData;
 typedef void FjBackendWindowContext;
-typedef void FjBackendDrawContext;
+typedef void FjDrawContext;
 
 
 struct FjBackendParams;

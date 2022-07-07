@@ -1,7 +1,7 @@
 #ifndef _FEJIX_DRAWER_NANOVG_H_
 #define _FEJIX_DRAWER_NANOVG_H_
 
-#include <fejix_runtime/fejix_defines.h>
+#include <fejix_runtime/defines.h>
 
 #include <glad/gl.h>
 

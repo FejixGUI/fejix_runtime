@@ -8,34 +8,19 @@ and difficulties of porting complete frameworks to other languages.
 
 This library is supposed to handle:
 - window management
-- rendering widgets
-- laying out widgets (more precisely, making it simple
-  and providing a set of default layouts)
+- simple graphics rendering (via wrapping another library)
+- laying out widgets (more precisely, making it simple and providing a set of default layouts)
 - global UI events (key presses, DPI changes)
 - localising cursor movement and clicks to specific widgets
-
-Allocation of windows and widgets is not handled by Fejix runtime. 
+- and other small things
 
 ## Build
 
 ```sh
-cmake -B build
+cmake -B build -D <OPTION1>=<VALUE1> -D <OPTION2>=<VALUE2> ...
 cmake --build build
 ```
 
-### Build requirements
+Choosing options is crucial for building Fejix because it does not have default options.
 
-**X11:**
-
-* `libx11-xcb-dev`
-* `libxcb-sync-dev`
-* `libxcb-icccm4-dev`
-
-
-### Additional steps
-
-In order to convert `.glsl` shaders to `.c` files (simply generate C strings)
-you need to run:
-```
-./tools/proc-opengl3.sh
-```
+See [BUILD.md](./BUILD.md) for full list of options and build requirements.

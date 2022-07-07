@@ -1,4 +1,4 @@
-#include <fejix_drawer/nanovg/nanovg.h>
+#include <fejix_private/nanovg/nanovg.h>
 
 #include <math.h>
 #define NANOVG_GL3_IMPLEMENTATION

@@ -16,36 +16,33 @@ static void _defaultLayout(struct FjWidget *self, uint32_t mode)
 {
 
 #define FIRST_CHILD(w) (w)->content[0]
-#define GEOM(w) (w)->_geometry
-#define CONST(w) (w)->constraints
 
-    // No content
-    if (L(self) == 0) {
-        GEOM(self).x1 = CONST(self).x1;
-        GEOM(self).y1 = CONST(self).y1;
-        GEOM(self).x2 = CONST(self).x2;
-        GEOM(self).y2 = CONST(self).y2;
-        return;
-    }
+    switch (mode) {
+        case FJ_LAYOUT_MAX:
+            self->_tmpConstraints.maxW = self->constraints.maxW;
+            self->_tmpConstraints.maxH = self->constraints.maxH;
+        break;
 
-    // HACK
-    // This works because:
-    // Traversal #1 - we copy MIN and MAX sizes
-    // Traversal #2 - we copy EXACT size and position
-    GEOM(FIRST_CHILD(self)).x1 = GEOM(self).x1;
-    GEOM(FIRST_CHILD(self)).y1 = GEOM(self).y1;
-    GEOM(FIRST_CHILD(self)).x2 = GEOM(self).x2;
-    GEOM(FIRST_CHILD(self)).y2 = GEOM(self).y2;
+        case FJ_LAYOUT_MIN:
+            self->_tmpConstraints.minW = self->constraints.minW;
+            self->_tmpConstraints.minH = self->constraints.minH;
+        break;
 
-    // This is the root widget
-    if (self->container == NULL && mode == FJ_LAYOUT_EXACT) {
-        GEOM(self).x1 = 0;
-        GEOM(self).y1 = 0;
+        case FJ_LAYOUT_EXACT:
+            if (self->container != NULL) {
+                self->_geometry.x = self->container->_geometry.x;
+                self->_geometry.y = self->container->_geometry.y;
+            } else {
+                self->_geometry.x = 0;
+                self->_geometry.y = 0;
+            }
+
+            self->_geometry.w = self->_tmpConstraints.maxW;
+            self->_geometry.h = self->_tmpConstraints.maxH;
+        break;
     }
 
 #undef FIRST_CHILD
-#undef GEOM
-#undef CONST
 }
 
 
@@ -57,7 +54,7 @@ static void _defaultLayout(struct FjWidget *self, uint32_t mode)
  * 2. Every layout() method handles the situation when a widget has no content
  * 3. layout() method of the root widget:
  *    - sets its own X/Y to 0
- *    - receives W/H from _geometry.x/y2
+ *    - receives W/H from _geometry
  *    - sets its own exact W/H
  * 4. All widgets reference their container
  * 5. All widgets' content elements are non-NULL
@@ -72,8 +69,8 @@ void _fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
         return;
 
     I(wgt) = 0;
-    wgt->_geometry.x2 = windowW;
-    wgt->_geometry.y2 = windowH;
+    wgt->_geometry.w = windowW;
+    wgt->_geometry.h = windowH;
 
     // Perform 2 depth-first traversals
 

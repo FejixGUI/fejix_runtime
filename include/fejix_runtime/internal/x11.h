@@ -60,7 +60,7 @@ struct FjWindow {
     uint32_t height;
 
     FjBackendWindowContext *windowContext;
-    FjBackendDrawContext *drawContext;
+    FjDrawContext *drawContext;
     /// @}
 
     xcb_window_t windowId;

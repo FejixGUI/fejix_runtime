@@ -1,15 +1,7 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_platform/x11/opengl3/opengl3.h>
+#include <fejix_private/x11/opengl3/opengl3.h>
 
-#if 0
-// TODO FUTURE Fejix's own renderer
-#   include <fejix_drawer/opengl3/opengl3.h>
-#endif
-
-#ifdef FJ_USE_NANOVG
-#   include <fejix_drawer/nanovg/nanovg.h>
-#endif
 
 #include <malloc.h>
 
@@ -259,7 +251,9 @@ uint32_t draw(
     drawContext->height = H;
 
     // _fjDraw_opengl3(win->drawContext);
+#ifdef FJ_USE_NANOVG
     _fjDraw_nanovg(drawContext);
+#endif
 
     // glXMakeContextCurrent(
     //     win->instance->xDisplay,

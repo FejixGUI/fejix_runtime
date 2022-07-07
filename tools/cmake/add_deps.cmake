@@ -15,11 +15,11 @@ if(FEJIX_USE_X11)
 endif()
 
 if(FEJIX_USE_OPENGL3)
-    target_include_directories(fejix_runtime PUBLIC "${SRC}/deps/glad/include")
-    target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/gl.c")
+    target_include_directories(fejix_runtime PUBLIC "${ROOT}/deps/glad/include")
+    target_sources(fejix_runtime PRIVATE "${ROOT}/deps/glad/src/gl.c")
 
     if(FEJIX_USE_X11)
-        target_sources(fejix_runtime PRIVATE "${SRC}/deps/glad/src/glx.c")
+        target_sources(fejix_runtime PRIVATE "${ROOT}/deps/glad/src/glx.c")
         target_link_libraries(fejix_runtime "dl")
     endif()
 
@@ -29,5 +29,6 @@ if(FEJIX_USE_OPENGL3)
 endif()
 
 if(FEJIX_USE_NANOVG)
-    include("${SRC}/tools/cmake/build_3dparty/nanovg.cmake")
+    target_sources(fejix_runtime PRIVATE "${ROOT}/deps/nanovg/src/nanovg.c")
+    target_include_directories(fejix_runtime PRIVATE "${ROOT}/deps/nanovg/src")
 endif()
