@@ -1,5 +1,5 @@
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/fejix_stdui.h>
+#include <fejix_runtime/stdui.h>
 
 
 #define CONST_MIN_W(WGT) (WGT)->constraints.minW
@@ -162,7 +162,7 @@ void fjStdRowLayout(struct FjWidget *self, uint32_t mode)
                         MAX_W(CHILD(i))
                     );
 
-                    EXACT_H(CHILD(i)) = 
+                    // EXACT_H(CHILD(i)) = 
                 }
             }
         }

@@ -35,6 +35,10 @@ endif()
 
 
 if(FEJIX_USE_NANOVG)
+    if(NOT FEJIX_USE_OPENGL3)
+        message(FATAL_ERROR "NanoVG requires OpenGL3!")
+    endif()
+ 
     target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_NANOVG")
 endif()
 

@@ -31,10 +31,10 @@
  * Do not define multiple instances in one thread
  * 
  * @todo Multi-thread
- * @todo Multi-instance
+ * @todo Multi-app
  * 
  */
-struct FjInstance {
+struct FjApp {
     HINSTANCE hInst;
     WNDCLASSEX windowClass;
     uint32_t backend;
@@ -49,7 +49,7 @@ struct FjInstance {
 
 
 struct FjWindow {
-    struct FjInstance *instance;
+    struct FjApp *app;
 
     HWND hWnd;
     HDC hDC; ///< Temporary internal value

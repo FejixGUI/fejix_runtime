@@ -1,5 +1,5 @@
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/fejix_helper.h>
+#include <fejix_runtime/helper.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,19 +13,6 @@
 #endif
 
 #define arrlen(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
-
-
-uint32_t initBackend(FjBackendParams *ctx)
-{
-    ctx->backend = FJ_BACKEND_OPENGL3;
-
-    uint32_t status = fjBackendInit(ctx);
-
-    if (status != FJ_OK)
-        puts("Error: cannot initialize OpenGL 3!");
-
-    return status;
-}
 
 
 uint32_t handleEvent(FjWindow *win, FjEvent *ev)
@@ -56,35 +43,38 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
 }
 
 
-FjInstance inst = {0};
+FjApp app = {0};
 FjWindow win = {0};
 
+FjAppParams appParams = {
+    .backend0 = FJ_BACKEND_NANOVG,
+    .backend1 = FJ_BACKEND_NONE
+};
 
+FjWindowParams winParams = {
+    .width = 800,
+    .height = 600,
+    .minWidth = 100,
+    .minHeight = 70,
+    .isResizable = 1
+};
 
 int main() {
-    _(fjInstanceInit(&inst, &initBackend));
+    _(fjAppInit(&app, &appParams));
 
-    FjWindowParams wparams = {
-        .width = 800,
-        .height = 600,
-        .minWidth = 100,
-        .minHeight = 70,
-        .isResizable = 1
-    };
-
-    _(fjIntanceInitWindow(&inst, &win, &wparams));
+    _(fjAppInitWindow(&app, &win, &winParams));
 
     _(fjWindowSetTitle(&win, "Це працює!"));
 
     fjWindowSetVisible(&win, true);
 
     FjWindow *windows[] = { &win };
-    fjInstanceSetWindows(&inst, windows, arrlen(windows));
-    fjLoop(&inst, &handleEvent);
+    fjAppSetWindows(&app, windows, arrlen(windows));
+    fjLoop(&app, &handleEvent);
 
     fjWindowDestroy(&win);
 
-    fjInstanceDestroy(&inst);
+    fjAppDestroy(&app);
 
     return 0;
 }

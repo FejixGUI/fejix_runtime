@@ -1,3 +1,14 @@
+- [Project structure](#project-structure)
+- [Fejix Runtime details](#fejix-runtime-details)
+- [Code style](#code-style)
+  - [Naming](#naming)
+  - [Line width](#line-width)
+  - [Typedefs](#typedefs)
+  - [Forward declarations](#forward-declarations)
+  - [Header files path](#header-files-path)
+  - [Numeric types](#numeric-types)
+  - [Comments](#comments)
+
 # Project structure
 
 * [include](./include/) - all headers
@@ -10,6 +21,23 @@
 * [test](./test/) - development test(s)
 * [tools](./tools/) - tools that aid building the project
 * [deprecated](./deprecated/) - all deprecated code that may be useful in the future
+
+# Fejix Runtime details
+
+This might be too cryptic, but it is worth to mention.
+
+All platform-specific functionalities like windowing API and OpenGL context creation are organised in the following way:
+1. Platform-specific headers define platform-specific data types (`struct`s).
+2. Generic headers select the platform-specific header for the current platform and declare generic functions using the types from (1).
+3. Platform-specific source files implement the functions declared in (2).
+
+All rendering backends are organised like this:
+1. [fejix_runtime/internal/backend.h](include/fejix_runtime/internal/backend.h) defines the `FjBackend` structure
+    which contains virtual functions (pointers to functions).
+2. The `fjBackendInitApp` function defined in 
+   [fejix_private/backend_generic.h](include/fejix_private/backend_generic.h) tries to run all possible
+   `fjBackendInitApp_<BACKEND_NAME>` functions when a new App is being created. I said "all possible" because if an
+   initialiser fails, `fjBackendInitApp` falls back to another one.
 
 # Code style
 

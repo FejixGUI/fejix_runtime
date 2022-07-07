@@ -1,44 +1,18 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private/x11/opengl3/opengl3.h>
-
+#include <fejix_private/opengl3_generic.h>
 
 #include <malloc.h>
 
 
-static void destroy(
-    struct FjBackendInstanceContext *
-); 
-static uint32_t initWindow(
-    struct FjBackendInstanceContext *, struct FjWindow *
-); 
-static void destroyWindow(
-    struct FjBackendInstanceContext *, struct FjWindow *
-); 
-static uint32_t draw(
-    struct FjBackendInstanceContext *, struct FjWindow *, uint32_t W, uint32_t H
-);
-static uint32_t present(
-    struct FjBackendInstanceContext *, struct FjWindow *
-);
 
-
-uint32_t _fjBackendInitInstance_opengl3(struct FjBackendParams *ctx)
+uint32_t fjBackendInitApp_opengl3(
+    struct FjApp *app,
+    struct FjBackendAppData_opengl3 *appData,
+    struct FjBackendParams *params
+)
 {
-    struct FjInstance *instance;
-    struct FjBackendInstanceContext *instanceContext;
-    struct FjBackendInstanceData_opengl3 *instanceData;
-
-    instance = ctx->instance;
-    instanceContext = &instance->instanceContext;
-
-    instanceData = malloc(sizeof(*instanceData));
-    if (!instanceData)
-        return FJ_ERR_MALLOC_FAILED;
-
-    instanceContext->instanceData = instanceData;
-
-    if (!gladLoaderLoadGLX(instance->xDisplay, instance->xDefaultScreen))
+    if (!gladLoaderLoadGLX(app->xDisplay, app->xDefaultScreen))
         return FJ_ERR_WMAPI_FAILED;
 
     // Don't even think about initializing OpenGL without an existing context!
@@ -67,223 +41,123 @@ uint32_t _fjBackendInitInstance_opengl3(struct FjBackendParams *ctx)
     int numFbConfigs = 0;
 
     framebufferConfigs = glXChooseFBConfig(
-        instance->xDisplay,
-        instance->xDefaultScreen,
+        app->xDisplay,
+        app->xDefaultScreen,
         visualAttribs,
         &numFbConfigs
     );
 
     // TODO Select the right framebuffer configuration
-    instanceData->framebufferConfig = framebufferConfigs[0];
+    appData->framebufferConfig = framebufferConfigs[0];
 
     glXGetFBConfigAttrib(
-        instance->xDisplay,
-        instanceData->framebufferConfig,
+        app->xDisplay,
+        appData->framebufferConfig,
         GLX_VISUAL_ID,
-        &instance->windowVisualId
+        &app->windowVisualId
     );
 
-    xcb_free_colormap(instance->connection, instance->colormapId);
+    xcb_free_colormap(app->connection, app->colormapId);
 
     xcb_create_colormap(
-        instance->connection,
+        app->connection,
         XCB_COLORMAP_ALLOC_NONE,
-        instance->colormapId,
-        instance->screen->root,
-        instance->windowVisualId
+        app->colormapId,
+        app->screen->root,
+        app->windowVisualId
     );
-
-    instanceContext->backendId = FJ_BACKEND_OPENGL3;
-
-    instanceContext->destroy = &destroy;
-    instanceContext->initWindow = &initWindow;
-    instanceContext->destroyWindow = &destroyWindow;
-    instanceContext->draw = &draw;
-    instanceContext->present = &present;
 
     return FJ_OK;
 }
 
 
 
-void destroy(struct FjBackendInstanceContext *instanceContext)
+void fjBackendDestroyApp_opengl3(
+    struct FjApp *app,
+    struct FjBackendAppData_opengl3 *appData
+)
 {
-    instanceContext->backendId = FJ_BACKEND_NONE;
-
-    if (instanceContext->instanceData != NULL)
-        free(instanceContext->instanceData);
-
     gladLoaderUnloadGLX();
 }
 
 
 
-uint32_t initWindow(
-    struct FjBackendInstanceContext *instanceContext,
-    struct FjWindow *win
+uint32_t fjBackendInitWindow_opengl3(
+    struct FjApp *app,
+    struct FjWindow *win,
+    struct FjBackendAppData_opengl3 *appData,
+    struct FjBackendWindowData_opengl3 *winData
 )
 {
-    struct FjInstance *instance;
-    struct FjBackendInstanceData_opengl3 *instanceData;
-    struct FjBackendWindowContext_opengl3 *windowContext;
-    // struct FjBackendDrawContext_opengl3 *drawContext;
-#ifdef FJ_USE_NANOVG
-    struct FjDrawContext_nanovg *drawContext;
-#endif
-
-    instance = win->instance;
-    instanceData = instanceContext->instanceData;
-
-    windowContext = malloc(sizeof(*windowContext));
-    if (!windowContext)
-        return FJ_ERR_MALLOC_FAILED;
-
-    drawContext = malloc(sizeof(*drawContext));
-    if (!drawContext) {
-        free(windowContext);
-        return FJ_ERR_MALLOC_FAILED;
-    }
-
-    win->windowContext = windowContext;
-    win->drawContext = drawContext;
-
-    windowContext->glctx = glXCreateNewContext(
-        instance->xDisplay,
-        instanceData->framebufferConfig,
+    winData->glctx = glXCreateNewContext(
+        app->xDisplay,
+        appData->framebufferConfig,
         GLX_RGBA_TYPE,
         0,
         True
     );
 
-    if (!windowContext->glctx) {
-        free(windowContext);
-        free(drawContext);
+    if (!winData->glctx)
         return FJ_ERR_BACKEND_FAILED;
-    }
 
-
-    windowContext->glxwin = glXCreateWindow(
-        instance->xDisplay,
-        instanceData->framebufferConfig,
+    winData->glxwin = glXCreateWindow(
+        app->xDisplay,
+        appData->framebufferConfig,
         win->windowId,
         NULL // Attribute list
     );
 
-    if (!windowContext->glxwin) {
-        glXDestroyContext(instance->xDisplay, windowContext->glctx);
-        free(windowContext);
-        free(drawContext);
+    if (!winData->glxwin) {
+        glXDestroyContext(app->xDisplay, winData->glctx);
         return FJ_ERR_BACKEND_FAILED;
     }
 
     glXMakeContextCurrent(
-        instance->xDisplay,
-        windowContext->glxwin,
-        windowContext->glxwin,
-        windowContext->glctx
+        app->xDisplay,
+        winData->glxwin,
+        winData->glxwin,
+        winData->glctx
     );
 
     if (glClear == NULL) {
         if (!gladLoaderLoadGL()) {
-            glXDestroyContext(instance->xDisplay, windowContext->glctx);
-            glXDestroyWindow(instance->xDisplay, windowContext->glxwin);
-            free(drawContext);
-            free(windowContext);
-            win->windowContext = NULL;
-            win->drawContext = NULL;
+            glXDestroyContext(app->xDisplay, winData->glctx);
+            glXDestroyWindow(app->xDisplay, winData->glxwin);
             return FJ_ERR_WMAPI_FAILED;
         }
     }
 
-    // return _fjDrawContextInit_opengl3(drawContext);
-    return _fjDrawContextInit_nanovg(drawContext);
+    return FJ_OK;
 }
 
 
-void destroyWindow(
-    struct FjBackendInstanceContext *instanceContext,
-    struct FjWindow *win
-)
-{
-    struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
-
-#ifdef FJ_USE_NANOVG
-    struct FjDrawContext_nanovg *drawContext = win->drawContext;
-#endif
-
-    if (windowContext) {
-        glXDestroyWindow(win->instance->xDisplay, windowContext->glxwin);
-        glXDestroyContext(win->instance->xDisplay, windowContext->glctx);
-        free(windowContext);
-    }
-
-    if (drawContext) {
-        // _fjDrawContextDestroy_opengl3(drawContext);
-#ifdef FJ_USE_NANOVG
-        _fjDrawContextDestroy_nanovg(drawContext);
-#endif
-        free(drawContext);
-    }
-}
-
-
-uint32_t draw(
-    struct FjBackendInstanceContext *instanceContext,
+void fjBackendDestroyWindow_opengl3(
     struct FjWindow *win,
-    uint32_t W,
-    uint32_t H
+    struct FjBackendWindowData_opengl3 *winData
 )
 {
-    struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
-    // struct FjBackendDrawContext_opengl3 *drawContext = win->drawContext;
-#ifdef FJ_USE_NANOVG
-    struct FjDrawContext_nanovg *drawContext = win->drawContext;
-#endif
-
-    glXMakeContextCurrent(
-        win->instance->xDisplay,
-        windowContext->glxwin,
-        windowContext->glxwin,
-        windowContext->glctx
-    );
-
-    drawContext->width = W;
-    drawContext->height = H;
-
-    // _fjDraw_opengl3(win->drawContext);
-#ifdef FJ_USE_NANOVG
-    _fjDraw_nanovg(drawContext);
-#endif
-
-    // glXMakeContextCurrent(
-    //     win->instance->xDisplay,
-    //     0, 0, 0
-    // );
-
-    return FJ_OK;
+    glXDestroyWindow(win->app->xDisplay, winData->glxwin);
+    glXDestroyContext(win->app->xDisplay, winData->glctx);
 }
 
 
-uint32_t present(
-    struct FjBackendInstanceContext *instanceContext,
-    struct FjWindow *win
+
+void fjBackendPresentWindow_opengl3(
+    struct FjWindow *win,
+    struct FjBackendWindowData_opengl3 *winData
 )
 {
-    struct FjBackendWindowContext_opengl3 *windowContext = win->windowContext;
-
     glXMakeContextCurrent(
-        win->instance->xDisplay,
-        windowContext->glxwin,
-        windowContext->glxwin,
-        windowContext->glctx
+        win->app->xDisplay,
+        winData->glxwin,
+        winData->glxwin,
+        winData->glctx
     );
 
-    glXSwapBuffers(win->instance->xDisplay, windowContext->glxwin);
+    glXSwapBuffers(win->app->xDisplay, winData->glxwin);
 
     // glXMakeContextCurrent(
-    //     win->instance->xDisplay,
+    //     win->app->xDisplay,
     //     0, 0, 0
     // );
-
-    return FJ_OK;
 }

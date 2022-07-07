@@ -2,8 +2,8 @@
 #define _FEJIX_X11_H_
 
 
-#include <fejix_runtime/fejix_defines.h>
-#include <fejix_runtime/fejix_backend.h>
+#include <fejix_runtime/definitions.h>
+#include <fejix_runtime/internal/backend.h>
 
 #include <X11/Xlib-xcb.h>
 #include <xcb/sync.h>
@@ -22,11 +22,11 @@
 
 
 
-struct FjInstance {
+struct FjApp {
     struct FjWindow **windows;
     uint32_t windowsLen;
 
-    struct FjBackendInstanceContext instanceContext;
+    struct FjBackend backend;
 
     // Xlib stuff
     Display *xDisplay;
@@ -52,15 +52,14 @@ struct FjInstance {
 struct FjWindow {
     /// @defgroup generic Generic fields
     /// @{
-    struct FjInstance *instance;
+    struct FjApp *app;
     struct FjWidget *root;
     void *data;
 
     uint32_t width;
     uint32_t height;
 
-    FjBackendWindowContext *windowContext;
-    FjDrawContext *drawContext;
+    FjBackendWindowData *backendWindowData;
     /// @}
 
     xcb_window_t windowId;

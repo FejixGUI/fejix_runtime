@@ -23,12 +23,12 @@
 
 
 #define FJ_BACKEND_NONE         0
-#define FJ_BACKEND_OPENGL3      1
+#define FJ_BACKEND_NANOVG       1
 
 
 struct FjWidget;
 struct FjWindow;
-struct FjInstance;
+struct FjApp;
 
 typedef uint32_t (*FjEventHandler)(
     struct FjWindow *win,

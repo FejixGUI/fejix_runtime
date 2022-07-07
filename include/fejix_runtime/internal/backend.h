@@ -1,5 +1,5 @@
 /**
- * @file fejix_backend_wrapper.h
+ * @file
  * @brief Contains functions that redirect to actual backend functions depending
  * on the backend that has been initialized.
  * 
@@ -9,53 +9,48 @@
 #define _FEJIX_BACKEND_H_
 
 
-typedef void FjBackendInstanceData;
-typedef void FjBackendWindowContext;
-typedef void FjDrawContext;
+typedef void FjBackendAppData;
+typedef void FjBackendWindowData;
 
 
 struct FjBackendParams;
-struct FjInstance;
+struct FjApp;
 struct FjWindow;
 
 
-struct FjBackendInstanceContext {
-    struct FjInstance *instance;
-    FjBackendInstanceData *instanceData;
+struct FjBackend {
+    struct FjApp *app;
+    FjBackendAppData *appData;
 
     uint32_t backendId;
 
     void (*destroy)(
-        struct FjBackendInstanceContext *self
+        struct FjBackend *self
     );
 
     uint32_t (*initWindow)(
-        struct FjBackendInstanceContext *self,
+        struct FjBackend *self,
         struct FjWindow *win
     ); 
 
     void (*destroyWindow)(
-        struct FjBackendInstanceContext *self,
+        struct FjBackend *self,
         struct FjWindow *win
     ); 
 
-    uint32_t (*draw)(
-        struct FjBackendInstanceContext *self,
+    uint32_t (*drawWindow)(
+        struct FjBackend *self,
         struct FjWindow *win,
         uint32_t width,
         uint32_t height
     );
 
-    uint32_t (*present)(
-        struct FjBackendInstanceContext *self,
+    void (*presentWindow)(
+        struct FjBackend *self,
         struct FjWindow *win
     );
 };
 
-
-#ifdef FJ_USE_OPENGL3
-    uint32_t _fjBackendInitInstance_opengl3(struct FjBackendParams *ctx); 
-#endif
 
 
 

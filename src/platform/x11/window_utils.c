@@ -1,7 +1,7 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private_defines.h>
-#include <fejix_platform/x11/window_utils.h>
+#include <fejix_private/definitions.h>
+#include <fejix_private/x11/window_utils.h>
 
 void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
 {
@@ -34,7 +34,7 @@ void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
         );
 
     xcb_icccm_set_wm_size_hints(
-        win->instance->connection,
+        win->app->connection,
         win->windowId,
         XCB_ATOM_WM_NORMAL_HINTS,
         &sizeHints
@@ -45,32 +45,32 @@ void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
 
 void _fjWindowInitSyncCounter(struct FjWindow *win)
 {
-    win->syncCounter = xcb_generate_id(win->instance->connection);
+    win->syncCounter = xcb_generate_id(win->app->connection);
     win->syncValue = (xcb_sync_int64_t) { 0, 0 };
     xcb_sync_create_counter(
-        win->instance->connection,
+        win->app->connection,
         win->syncCounter,
         win->syncValue
     );
 
     xcb_change_property(
-        win->instance->connection,
+        win->app->connection,
         XCB_PROP_MODE_REPLACE,
         win->windowId,
-        win->instance->atom_NET_WM_SYNC_REQUEST_COUNTER,
+        win->app->atom_NET_WM_SYNC_REQUEST_COUNTER,
         XCB_ATOM_CARDINAL,
         SIZEOF_BITS(win->syncCounter),
         1,
         &win->syncCounter
     );
-    xcb_flush(win->instance->connection);
+    xcb_flush(win->app->connection);
 }
 
 
 
 void _fjWindowDestroySyncCounter(struct FjWindow *win)
 {
-    xcb_sync_destroy_counter(win->instance->connection, win->syncCounter);
+    xcb_sync_destroy_counter(win->app->connection, win->syncCounter);
 }
 
 
@@ -81,10 +81,10 @@ void _fjWindowIncrSyncCounter(struct FjWindow *win)
     val++;
 
     xcb_sync_set_counter(
-        win->instance->connection,
+        win->app->connection,
         win->syncCounter,
         win->syncValue
     );
 
-    xcb_flush(win->instance->connection);
+    xcb_flush(win->app->connection);
 }

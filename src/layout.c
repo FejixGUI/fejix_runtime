@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_layout.h>
+#include <fejix_runtime/internal/layout.h>
 
 
 #define L(w) (w)->contentLength

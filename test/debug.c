@@ -1,7 +1,7 @@
 #include "debug.h"
 #include <stdlib.h>
 
-#include <fejix_runtime/fejix_defines.h>
+#include <fejix_runtime/definitions.h>
 
 void checkFj(const char *file, int line, int value)
 {

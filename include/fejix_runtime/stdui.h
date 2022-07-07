@@ -1,7 +1,7 @@
 #ifndef _FEJIX_STDUI_H_
 #define _FEJIX_STDUI_H_
 
-#include <fejix_runtime/fejix_defines.h>
+#include <fejix_runtime/definitions.h>
 
 struct FjWidget;
 

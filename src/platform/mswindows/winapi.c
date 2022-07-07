@@ -16,18 +16,18 @@ static LRESULT CALLBACK _winProc(
     LPARAM lParam
 );
 
-uint32_t fjInstanceInit(
-    struct FjInstance *instance,
+uint32_t fjAppInit(
+    struct FjApp *app,
     FjBackendInitializer init
 )
 {
-    instance->hInst = GetModuleHandle(NULL);
+    app->hInst = GetModuleHandle(NULL);
 
-    WNDCLASSEX *wc = &instance->windowClass;
+    WNDCLASSEX *wc = &app->windowClass;
     wc->cbSize = sizeof(WNDCLASSEX);
     wc->cbClsExtra = 0;
     wc->cbWndExtra = 0;
-    wc->hInstance = instance->hInst;
+    wc->hInstance = app->hInst;
     wc->lpfnWndProc = &_winProc;
     wc->hIcon = NULL;
     wc->hIconSm = NULL;
@@ -48,26 +48,26 @@ uint32_t fjInstanceInit(
 #endif
 
     struct FjBackendInitContext ctx;
-    ctx.instance = instance;
+    ctx.app = app;
 
     return init(&ctx);
 
 }
 
 
-void fjInstanceDestroy(struct FjInstance *instance)
+void fjAppDestroy(struct FjApp *app)
 {
-    UnregisterClass(_FJ_WCLASS, instance->hInst);
+    UnregisterClass(_FJ_WCLASS, app->hInst);
 }
 
 
-uint32_t fjIntanceInitWindow(
-    struct FjInstance *inst,
+uint32_t fjAppInitWindow(
+    struct FjApp *inst,
     struct FjWindow *win,
     const struct FjWindowParams *params
 )
 {
-    win->instance = inst;
+    win->app = inst;
 
     DWORD style = WS_TILED
                 | WS_SYSMENU /* The close/maximize/minimize button panel */
@@ -159,13 +159,13 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
 
 
 void fjLoop(
-    struct FjInstance *instance,
+    struct FjApp *app,
     FjEventHandler eventHandler,
     struct FjWindow **windows,
     uint32_t numberOfWindows
 )
 {
-    instance->handler = eventHandler;
+    app->handler = eventHandler;
 
     MSG msg = {0};
     while (GetMessage(&msg, NULL, 0, 0) > 0)
@@ -189,7 +189,7 @@ LRESULT CALLBACK _winProc(
     }
 
     struct FjWindow *win = (struct FjWindow *) lpUserData;
-    struct FjInstance *inst = win->instance;
+    struct FjApp *inst = win->app;
     FjEventHandler handler = inst->handler;
 
     struct FjEvent ev = {0};

@@ -8,8 +8,8 @@
 #define _ALIAS(X) typedef struct X X;
 
 #ifdef _FEJIX_H_
-    _ALIAS(FjInstance);
-    _ALIAS(FjBackendParams);
+    _ALIAS(FjApp);
+    _ALIAS(FjAppParams);
     _ALIAS(FjWindow);
     _ALIAS(FjWindowParams);
     _ALIAS(FjEvent);

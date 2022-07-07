@@ -14,7 +14,7 @@
 #endif
 
 
-#include <fejix_runtime/defines.h>
+#include <fejix_runtime/definitions.h>
 
 #ifdef FJ_USE_WINAPI
 #   include <fejix_runtime/internal/winapi.h>
@@ -24,15 +24,18 @@
 
 
 
-struct FjBackendParams {
-    struct FjInstance *instance;
-    uint32_t backend;
+
+/**
+ * @brief GUI application parameters
+ * 
+ */
+struct FjAppParams {
+    /// Primary backend
+    uint32_t backend0;
+
+    /// Fallback backend
+    uint32_t backend1;
 };
-
-
-typedef uint32_t (*FjBackendInitializer) (
-    struct FjBackendParams *initCtx
-);
 
 
 /**
@@ -66,29 +69,25 @@ struct FjWindowParams {
 
 /**
  * @brief Initializes the windowing API and graphical backend associated with
- * the instance.
+ * the app.
  * 
  * @details Initializer must look for, select and initilize a backend itself.
  * 
- * @param instance The Fejix instance to initialize.
- * @param initializer Mandatory backend initializer function
+ * @param app The Fejix GUI application to initialize.
+ * @param params Application parameters
  * @return uint32_t status, FJ_OK if succeeds, error code otherwise.
  */
-uint32_t fjInstanceInit(
-    struct FjInstance *instance,
-    FjBackendInitializer initializer
+uint32_t fjAppInit(
+    struct FjApp *app,
+    struct FjAppParams *params
 );
 
-void fjInstanceDestroy(
-    struct FjInstance *instance
+void fjAppDestroy(
+    struct FjApp *app
 );
 
-uint32_t fjBackendInit(
-    struct FjBackendParams *ctx
-);
-
-uint32_t fjIntanceInitWindow(
-    struct FjInstance *instance,
+uint32_t fjAppInitWindow(
+    struct FjApp *app,
     struct FjWindow *window,
     struct FjWindowParams *params
 );
@@ -104,8 +103,8 @@ void fjWindowDestroy(
  * dynamically)
  * @param windowsLen Length of the array 
  */
-void fjInstanceSetWindows(
-    struct FjInstance *instance,
+void fjAppSetWindows(
+    struct FjApp *app,
     struct FjWindow **windows,
     uint32_t windowsLen
 );
@@ -131,11 +130,11 @@ uint32_t fjWindowSetTitle(
 /**
  * @brief Runs the main GUI loop.
  * 
- * @param instance Fejix instance
+ * @param app Fejix app
  * @param eventHandler Handler for all global events
  */
 void fjLoop(
-    struct FjInstance *instance,
+    struct FjApp *app,
     FjEventHandler eventHandler
 );
 
