@@ -7,6 +7,7 @@
 uint32_t fjBackendInitApp(struct FjApp *app, struct FjBackend *backend, struct FjBackendParams *params)
 {
     backend->backendId = FJ_BACKEND_NONE;
+    backend->app = app;
 
     uint32_t backendId = params->backend0;
     uint32_t status = FJ_OK;

@@ -33,6 +33,11 @@ void fjBackendDestroyWindow_opengl3(
     struct FjBackendWindowData_opengl3 *winData
 );
 
+void fjBackendPrepareWindow_opengl3(
+    struct FjWindow *win,
+    struct FjBackendWindowData_opengl3 *winData
+);
+
 void fjBackendPresentWindow_opengl3(
     struct FjWindow *win,
     struct FjBackendWindowData_opengl3 *winData

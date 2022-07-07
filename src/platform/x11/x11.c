@@ -103,7 +103,6 @@ uint32_t fjAppInit(struct FjApp *app, struct FjAppParams *params)
 
     // Initialize backend
 
-    app->backend.backendId = FJ_BACKEND_NONE;
 
     struct FjBackendParams backendParams = {0};
     backendParams.app = app;

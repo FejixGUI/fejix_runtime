@@ -142,7 +142,7 @@ void fjBackendDestroyWindow_opengl3(
 
 
 
-void fjBackendPresentWindow_opengl3(
+void fjBackendPrepareWindow_opengl3(
     struct FjWindow *win,
     struct FjBackendWindowData_opengl3 *winData
 )
@@ -153,11 +153,15 @@ void fjBackendPresentWindow_opengl3(
         winData->glxwin,
         winData->glctx
     );
+}
 
+
+
+/// Only a prepared window can be presented to the screen
+void fjBackendPresentWindow_opengl3(
+    struct FjWindow *win,
+    struct FjBackendWindowData_opengl3 *winData
+)
+{
     glXSwapBuffers(win->app->xDisplay, winData->glxwin);
-
-    // glXMakeContextCurrent(
-    //     win->app->xDisplay,
-    //     0, 0, 0
-    // );
 }
