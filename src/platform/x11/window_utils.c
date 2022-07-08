@@ -3,7 +3,7 @@
 #include <fejix_private/definitions.h>
 #include <fejix_private/x11/window_utils.h>
 
-void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
+void fjWindowInitParams_x11(struct FjWindow *win, struct FjWindowParams *params)
 {
     uint32_t
         minW = params->minWidth,
@@ -43,7 +43,7 @@ void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params)
 
 
 
-void _fjWindowInitSyncCounter(struct FjWindow *win)
+void fjWindowInitSyncCounter_x11(struct FjWindow *win)
 {
     win->syncCounter = xcb_generate_id(win->app->connection);
     win->syncValue = (xcb_sync_int64_t) { 0, 0 };
@@ -68,14 +68,14 @@ void _fjWindowInitSyncCounter(struct FjWindow *win)
 
 
 
-void _fjWindowDestroySyncCounter(struct FjWindow *win)
+void fjWindowDestroySyncCounter_x11(struct FjWindow *win)
 {
     xcb_sync_destroy_counter(win->app->connection, win->syncCounter);
 }
 
 
 
-void _fjWindowIncrSyncCounter(struct FjWindow *win)
+void fjWindowIncrSyncCounter_x11(struct FjWindow *win)
 {
     int64_t *val = (void *) &win->syncValue; // Yay! Unsafe code!
     val++;

@@ -3,12 +3,12 @@
 
 #include <fejix_runtime/fejix.h>
 
-void _fjWindowInitParams(struct FjWindow *win, struct FjWindowParams *params);
+void fjWindowInitParams_x11(struct FjWindow *win, struct FjWindowParams *params);
 
-void _fjWindowInitSyncCounter(struct FjWindow *win);
+void fjWindowInitSyncCounter_x11(struct FjWindow *win);
 
-void _fjWindowDestroySyncCounter(struct FjWindow *win);
+void fjWindowDestroySyncCounter_x11(struct FjWindow *win);
 
-void _fjWindowIncrSyncCounter(struct FjWindow *win);
+void fjWindowIncrSyncCounter_x11(struct FjWindow *win);
 
 #endif // _FEJIX_X11_WINDOW_UTILS_H_

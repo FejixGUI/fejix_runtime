@@ -2,6 +2,7 @@ target_sources(fejix_runtime
     PRIVATE
     "${ROOT}/src/generic.c"
     "${ROOT}/src/layout.c"
+    "${ROOT}/src/drawing.c"
     "${ROOT}/src/stdui.c"
     "${ROOT}/src/backend/backend_init.c"
 )
@@ -11,6 +12,7 @@ if(FEJIX_USE_NANOVG)
     target_sources(
         fejix_runtime PRIVATE
         "${ROOT}/src/backend/nanovg/nanovg.c"
+        "${ROOT}/src/backend/nanovg/drawing.c"
     )
 endif()
 

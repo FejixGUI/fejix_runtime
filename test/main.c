@@ -4,13 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 #include "debug.h"
-
-#ifndef __cplusplus
-#   define true 1
-#   define false 0
-#endif
 
 #define arrlen(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
 
@@ -21,7 +17,7 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
     {
         case FJ_EVENT_CLOSE:
             puts("Did you just close the window?");
-            fjWindowSetVisible(win, 0);
+            fjWindowSetVisible(win, false);
             return FJ_EXIT;
         break;
 
@@ -60,6 +56,11 @@ FjWindowParams winParams = {
 };
 
 int main() {
+    printf(
+        "Devtest is running Fejix v%d.%d.%d\n",
+        FJ_VERSION_MAJOR, FJ_VERSION_MINOR, FJ_VERSION_PATCH
+    );
+
     _(fjAppInit(&app, &appParams));
 
     _(fjAppInitWindow(&app, &win, &winParams));

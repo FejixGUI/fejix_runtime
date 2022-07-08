@@ -157,7 +157,7 @@ struct FjWidget {
 
     // Functions
     FjLayoutFn layout;
-    // FjDrawFn draw;
+    FjDrawFn draw;
     // FjCursorHandlerFn handle;
 };
 

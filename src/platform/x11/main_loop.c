@@ -53,11 +53,11 @@ void fjLoop(
 
                 // if (exposeEvent->count == 0) {
                 _fjLayout(win->root, win->width, win->height);
-                backend->drawWindow(backend, win, win->width, win->height);
+                backend->prepareWindow(backend, win, win->width, win->height);
 
-                _fjWindowIncrSyncCounter(win);
+                fjWindowIncrSyncCounter_x11(win);
                 backend->presentWindow(backend, win);
-                _fjWindowIncrSyncCounter(win);
+                fjWindowIncrSyncCounter_x11(win);
                 // }
             }
             break;

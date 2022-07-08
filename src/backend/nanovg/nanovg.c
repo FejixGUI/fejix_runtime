@@ -2,35 +2,28 @@
 #include <fejix_runtime/internal/backend.h>
 
 #include <fejix_private/nanovg/nanovg.h>
+#include <fejix_private/nanovg/drawing.h>
 #include <fejix_private/opengl3_generic.h>
 
 #include <math.h>
 #include <malloc.h>
 
 #include <nanovg.h>
-#define NANOVG_GL3_IMPLEMENTATION
+
+#ifdef FJ_USE_OPENGL3
+#   define NANOVG_GL3_IMPLEMENTATION
+#endif
 #include <nanovg_gl.h>
 
+#define SELF struct FjBackend *self
 
-typedef struct FjBackendAppData_opengl3 FjBackendAppData_nanovg;
-
-
-struct FjBackendWindowData_nanovg {
-    struct FjBackendWindowData_opengl3 *glWinData;
-
-    struct NVGcontext *nvgctx;
-    uint32_t width;
-    uint32_t height;
-};
-
-
-static void fjBackendDestroyApp_nanovg(struct FjBackend *self)
+static void fjBackendDestroyApp_nanovg(SELF)
 {
     fjBackendDestroyApp_opengl3(self->app, self->appData);
     free(self->appData);
 }
 
-static uint32_t fjBackendInitWindow_nanovg(struct FjBackend *self, struct FjWindow *win)
+static uint32_t fjBackendInitWindow_nanovg(SELF, struct FjWindow *win)
 {
     struct FjBackendWindowData_nanovg *winData;
     winData = malloc(sizeof(*winData));
@@ -57,11 +50,14 @@ static uint32_t fjBackendInitWindow_nanovg(struct FjBackend *self, struct FjWind
 
     win->backendWindowData = winData;
 
+    winData->drawContext.windowData = winData;
+    fjDrawContextInit_nanovg(&winData->drawContext);
+
     return FJ_OK;
 }
 
 
-static void fjBackendDestroyWindow_nanovg(struct FjBackend *self, struct FjWindow *win)
+static void fjBackendDestroyWindow_nanovg(SELF, struct FjWindow *win)
 {
     struct FjBackendWindowData_nanovg *winData = win->backendWindowData;
 
@@ -74,8 +70,8 @@ static void fjBackendDestroyWindow_nanovg(struct FjBackend *self, struct FjWindo
 
 
 
-static uint32_t fjBackendDrawWindow_nanovg(
-    struct FjBackend *self,
+static uint32_t fjBackendPrepareWindow_nanovg(
+    SELF,
     struct FjWindow *win,
     uint32_t width,
     uint32_t height
@@ -89,25 +85,35 @@ static uint32_t fjBackendDrawWindow_nanovg(
     glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
     glClear(GL_COLOR_BUFFER_BIT);
 
+    nvgBeginFrame(winData->nvgctx, width, height, 1);
 
-    NVGcontext *nvg = winData->nvgctx;
-    nvgBeginFrame(nvg, width, height, 1);
-    nvgRect(nvg, 0, 0, 100, 100);
-    nvgFillColor(nvg, (NVGcolor) {1.f, 0.5f, 0.f, 1.f});
-    nvgFill(nvg);
-    nvgEndFrame(nvg);
+    winData->width = width;
+    winData->height = height;
 
     return FJ_OK;
 }
 
-void fjBackendPresentWindow_nanovg(struct FjBackend *self, struct FjWindow *win)
+void fjBackendPresentWindow_nanovg(SELF, struct FjWindow *win)
 {
     struct FjBackendWindowData_nanovg  *winData = win->backendWindowData;
+    nvgEndFrame(winData->nvgctx);
     fjBackendPresentWindow_opengl3(win, winData->glWinData);
 }
 
 
-uint32_t fjBackendInitApp_nanovg(struct FjApp *app, struct FjBackend *backend, struct FjBackendParams *params)
+struct FjDrawContext *
+fjBackendGetWindowDrawContext_nanovg(SELF, struct FjWindow *win)
+{
+    struct FjBackendWindowData_nanovg  *winData = win->backendWindowData;
+    return &winData->drawContext;
+}
+
+
+uint32_t fjBackendInitApp_nanovg(
+    struct FjApp *app,
+    struct FjBackend *backend,
+    struct FjBackendParams *params
+)
 {
     uint32_t status;
 
@@ -131,8 +137,9 @@ uint32_t fjBackendInitApp_nanovg(struct FjApp *app, struct FjBackend *backend, s
     backend->destroy = &fjBackendDestroyApp_nanovg;
     backend->initWindow = &fjBackendInitWindow_nanovg;
     backend->destroyWindow = &fjBackendDestroyWindow_nanovg;
-    backend->drawWindow = &fjBackendDrawWindow_nanovg;
+    backend->prepareWindow = &fjBackendPrepareWindow_nanovg;
     backend->presentWindow = &fjBackendPresentWindow_nanovg;
+    backend->getWindowDrawContext = &fjBackendGetWindowDrawContext_nanovg;
 
     return FJ_OK;
 }

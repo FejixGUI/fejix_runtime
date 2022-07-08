@@ -172,7 +172,7 @@ uint32_t fjAppInitWindow(
     win->width = params->width;
     win->height = params->height;
 
-    _fjWindowInitParams(win, params);
+    fjWindowInitParams_x11(win, params);
 
     xcb_atom_t protocols[] = {
         app->atom_NET_WM_SYNC_REQUEST,
@@ -190,7 +190,7 @@ uint32_t fjAppInitWindow(
         protocols
     );
 
-    _fjWindowInitSyncCounter(win);
+    fjWindowInitSyncCounter_x11(win);
 
     win->root = NULL;
 
@@ -203,7 +203,7 @@ void fjWindowDestroy(struct FjWindow *win)
 {
     struct FjBackend *bk = &win->app->backend;
     bk->destroyWindow(bk, win);
-    _fjWindowDestroySyncCounter(win);
+    fjWindowDestroySyncCounter_x11(win);
     xcb_destroy_window(win->app->connection, win->windowId);
 }
 

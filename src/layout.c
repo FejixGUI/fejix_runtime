@@ -45,22 +45,8 @@ static void _defaultLayout(struct FjWidget *self, uint32_t mode)
 #undef FIRST_CHILD
 }
 
-
-/**
- * Handles the situation when root is NULL
- * 
- * Assumptions:
- * 1. Root widget has NULL container
- * 2. Every layout() method handles the situation when a widget has no content
- * 3. layout() method of the root widget:
- *    - sets its own X/Y to 0
- *    - receives W/H from _geometry
- *    - sets its own exact W/H
- * 4. All widgets reference their container
- * 5. All widgets' content elements are non-NULL
- * 6. If a widget has no layout() method, the _defaultLayout() is used
- *    P.S. Never leave your layout() method empty!
- */
+/// FIXME
+/// TODO
 void _fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
 {
     struct FjWidget *wgt = root;

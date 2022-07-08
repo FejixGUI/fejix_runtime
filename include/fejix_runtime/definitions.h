@@ -3,6 +3,8 @@
 
 #include <fejix_runtime/events.h>
 
+#include <fejix_runtime/internal/backend.h>
+
 #include <stdint.h>
 
 
@@ -33,6 +35,11 @@ struct FjApp;
 typedef uint32_t (*FjEventHandler)(
     struct FjWindow *win,
     struct FjEvent *ev
+);
+
+typedef void (*FjDrawFn) (
+    struct FjWidget *self,
+    struct FjDrawContext *ctx
 );
 
 typedef void (*FjLayoutFn) (
