@@ -1,4 +1,4 @@
-#include <fejix_private/backend_generic.h>
+#include <fejix_private/backend_init.h>
 
 #ifdef FJ_USE_NANOVG
 #   include <fejix_private/nanovg/nanovg.h>

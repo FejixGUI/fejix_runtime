@@ -3,7 +3,7 @@
 #include <fejix_runtime/internal/backend.h>
 
 #include <fejix_private/definitions.h>
-#include <fejix_private/backend_generic.h>
+#include <fejix_private/backend_init.h>
 #include <fejix_private/x11/window_utils.h>
 
 #include <string.h>
