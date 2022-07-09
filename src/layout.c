@@ -26,9 +26,9 @@ void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
 {
     if (root == NULL)
         return;
-        
-    root->_geometry.w = windowW;
-    root->_geometry.h = windowH;
+
+    root->geometry.w = windowW;
+    root->geometry.h = windowH;
 
     fjTraverseWidgets(root, &layoutMaxMin, NULL);
     fjTraverseWidgets(root, &layoutExact, NULL);

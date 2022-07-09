@@ -149,7 +149,7 @@ struct FjWidget {
 
     struct FjConstraints constraints;     // Min/Max sizes
     struct FjConstraints _tmpConstraints; // For layout calculation
-    struct FjGeometry _geometry;          // X/Y/W/H
+    struct FjGeometry geometry;          // X/Y/W/H
     struct FjXY weights;                  // Growing coefficients
 
     uint32_t contentLength;     // Number of children

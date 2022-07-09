@@ -85,7 +85,7 @@ static uint32_t fjBackendPrepareWindow_nanovg(
     glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    nvgBeginFrame(winData->nvgctx, width, height, 1);
+    nvgBeginFrame(winData->nvgctx, (float)width, (float)height, 1.0f);
 
     winData->width = width;
     winData->height = height;
@@ -93,7 +93,7 @@ static uint32_t fjBackendPrepareWindow_nanovg(
     return FJ_OK;
 }
 
-void fjBackendPresentWindow_nanovg(SELF, struct FjWindow *win)
+static void fjBackendPresentWindow_nanovg(SELF, struct FjWindow *win)
 {
     struct FjBackendWindowData_nanovg  *winData = win->backendWindowData;
     nvgEndFrame(winData->nvgctx);
@@ -101,7 +101,7 @@ void fjBackendPresentWindow_nanovg(SELF, struct FjWindow *win)
 }
 
 
-struct FjDrawContext *
+static struct FjDrawContext *
 fjBackendGetWindowDrawContext_nanovg(SELF, struct FjWindow *win)
 {
     struct FjBackendWindowData_nanovg  *winData = win->backendWindowData;
@@ -128,9 +128,10 @@ uint32_t fjBackendInitApp_nanovg(
         return status;
     }
 
-    status = fjBackendInitApp_opengl3(app, glData, params);
-    if (status != FJ_OK)
-        return status;
+    // How did it appear hear?
+    // status = fjBackendInitApp_opengl3(app, glData, params);
+    // if (status != FJ_OK)
+    //     return status;
 
     backend->appData = glData;
     backend->backendId = FJ_BACKEND_NANOVG;

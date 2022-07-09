@@ -1,9 +1,9 @@
 target_sources(fejix_runtime
     PRIVATE
     "${ROOT}/src/generic.c"
-    "${ROOT}/src/layout.c"
     "${ROOT}/src/drawing.c"
-    "${ROOT}/src/stdui.c"
+    "${ROOT}/src/layout.c"
+    "${ROOT}/src/stdlayout.c"
     "${ROOT}/src/backend/backend_init.c"
 )
 

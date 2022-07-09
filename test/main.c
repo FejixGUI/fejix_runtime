@@ -1,5 +1,6 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/helper.h>
+#include <fejix_runtime/stdlayout.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,6 +39,13 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
     return FJ_OK;
 }
 
+void drawRectangle(FjWidget *self, FjDrawContext *ctx) {
+    ctx->beginPath(ctx);
+    ctx->rrect(ctx, 0, 0, self->geometry.w, self->geometry.h, 20.0f);
+    ctx->setColor(ctx, 1.0f, 0.5f, 0.0f, 1.0f);
+    ctx->fill(ctx);
+}
+
 
 FjApp app = {0};
 FjWindow win = {0};
@@ -55,6 +63,9 @@ FjWindowParams winParams = {
     .isResizable = 1
 };
 
+FjWidget root = {0};
+FjWidget wgt1 = {0};
+
 int main() {
     printf(
         "Devtest is running Fejix v%d.%d.%d\n",
@@ -66,6 +77,16 @@ int main() {
     _(fjAppInitWindow(&app, &win, &winParams));
 
     _(fjWindowSetTitle(&win, "Це працює!"));
+
+    win.root = &root;
+    FjWidget *rootContent[] = {&wgt1};
+    root.content = rootContent;
+    root.contentLength = arrlen(rootContent);
+    root.layout = &fjStdRootLayout;
+
+    wgt1.constraints = (FjConstraints){0,0,200,100};
+    wgt1.layout = &fjStdSelfLayout;
+    wgt1.draw = &drawRectangle;
 
     fjWindowSetVisible(&win, true);
 

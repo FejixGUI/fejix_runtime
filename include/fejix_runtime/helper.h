@@ -14,6 +14,11 @@
     _ALIAS(FjWindowParams);
     _ALIAS(FjEvent);
     _ALIAS(FjWidget);
+    _ALIAS(FjDrawContext);
+
+    _ALIAS(FjConstraints);
+    _ALIAS(FjGeometry);
+    _ALIAS(FjXY);
 #endif
 
 #undef _ALIAS

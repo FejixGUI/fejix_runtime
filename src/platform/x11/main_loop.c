@@ -33,6 +33,12 @@ void fjLoop(
 {
     struct FjBackend *backend = &app->backend;
 
+    // Widgets are not layed out initially, so lay them out
+    for (int i=0; i<app->windowsLen; i++) {
+        struct FjWindow *win = app->windows[i];
+        fjLayout(win->root, win->width, win->height);
+    }
+
     for (;;)
     {
         xcb_generic_event_t *event = xcb_wait_for_event(app->connection);
@@ -76,12 +82,13 @@ void fjLoop(
                 if (win->width != W || win->height != H) {
                     win->width = W;
                     win->height = H;
+                    
+                    fjLayout(win->root, win->width, win->height);
+                    
                     ev.eventType = FJ_EVENT_RESIZE;
                     ev.resizeEvent.width = W;
                     ev.resizeEvent.height = H;
                     canHandle = 1;
-                    
-                    fjLayout(win->root, win->width, win->height);
                 }
 
             }

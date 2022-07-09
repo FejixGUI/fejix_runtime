@@ -1,11 +1,12 @@
-#ifndef _FEJIX_STDUI_H_
-#define _FEJIX_STDUI_H_
+#ifndef _FEJIX_STDLAYOUT_H_
+#define _FEJIX_STDLAYOUT_H_
 
 #include <fejix_runtime/definitions.h>
 
 struct FjWidget;
 
 void fjStdRootLayout(struct FjWidget *self, uint32_t mode);
+void fjStdSelfLayout(struct FjWidget *self, uint32_t mode);
 
 
 /// Row | Column
@@ -25,4 +26,4 @@ struct FjStdRowData {
 
 void fjStdRowLayout(struct FjWidget *self, uint32_t mode);
 
-#endif // _FEJIX_STDUI_H_
+#endif // _FEJIX_STDLAYOUT_H_

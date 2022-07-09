@@ -45,6 +45,7 @@ void fill(SELF)
 {
     WINDOW_DATA(data);
     nvgFillColor(data->nvgctx, data->color);
+    nvgFill(data->nvgctx);
 }
 
 void stroke(SELF, float width)

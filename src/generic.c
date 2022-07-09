@@ -39,14 +39,14 @@ void fjTraverseWidgets(
         if (I(wgt) == 0)
             if (widgetFn != NULL) {
                 int doNotTraverseContent = widgetFn(wgt, 1, data);
-                if (!doNotTraverseContent)
+                if (doNotTraverseContent)
                     I(wgt) = L(wgt); // Pretent that we finished this node
             }
 
         // We are finished with this widget [and its content]
         if (I(wgt) == L(wgt)) {
             I(wgt) = 0; // Clean up
-            if (widgetFn != NULL) widgetFn(wgt, 1, data);
+            if (widgetFn != NULL) widgetFn(wgt, 0, data);
             wgt = wgt->container; // Go up the tree
             continue;
         }
