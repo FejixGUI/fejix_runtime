@@ -1,7 +1,8 @@
 #include <fejix_runtime/fejix.h>
-#include <fejix_runtime/internal/layout.h>
 
 #include <fejix_private/x11/window_utils.h>
+#include <fejix_private/layout.h>
+#include <fejix_private/drawing.h>
 
 #include <malloc.h>
 
@@ -52,8 +53,8 @@ void fjLoop(
                 if (!win) break;
 
                 // if (exposeEvent->count == 0) {
-                _fjLayout(win->root, win->width, win->height);
                 backend->prepareWindow(backend, win, win->width, win->height);
+                fjDraw(win);
 
                 fjWindowIncrSyncCounter_x11(win);
                 backend->presentWindow(backend, win);
@@ -79,6 +80,8 @@ void fjLoop(
                     ev.resizeEvent.width = W;
                     ev.resizeEvent.height = H;
                     canHandle = 1;
+                    
+                    fjLayout(win->root, win->width, win->height);
                 }
 
             }

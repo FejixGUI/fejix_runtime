@@ -8,6 +8,7 @@
 #ifndef _FEJIX_BACKEND_H_
 #define _FEJIX_BACKEND_H_
 
+#include <fejix_runtime/definitions.h>
 
 typedef void FjBackendAppData;
 typedef void FjBackendWindowData;

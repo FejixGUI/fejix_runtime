@@ -31,7 +31,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 target_include_directories(fejix_runtime PUBLIC "include")
 
 # Let it decide what C files to use
-include("${ROOT}/tools/cmake/select_sources.cmake")
+include("${ROOT}/tools/cmake/add_sources.cmake")
 
 # Add dependencies
 include("${ROOT}/tools/cmake/add_deps.cmake")

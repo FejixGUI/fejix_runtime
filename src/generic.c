@@ -38,7 +38,11 @@ void fjTraverseWidgets(
         
         // This widget is visited the first time
         if (I(wgt) == 0)
-            if (downFn != NULL) downFn(wgt, data);
+            if (downFn != NULL) {
+                int doNotTraverseContent = downFn(wgt, data);
+                if (!doNotTraverseContent)
+                    I(wgt) = L(wgt); // Pretent that we finished this node
+            }
 
         // We are finished with this widget [and its content]
         if (I(wgt) == L(wgt)) {

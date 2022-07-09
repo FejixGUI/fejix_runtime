@@ -3,7 +3,7 @@
 
 #include <fejix_private/nanovg/nanovg.h>
 #include <fejix_private/nanovg/drawing.h>
-#include <fejix_private/opengl3_generic.h>
+#include <fejix_private/opengl/opengl3_generic.h>
 
 #include <math.h>
 #include <malloc.h>

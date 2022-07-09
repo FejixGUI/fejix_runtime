@@ -3,7 +3,8 @@
 
 struct FjWidget;
 
-typedef void (*FjWidgetFn)(struct FjWidget *wgt, void *data);
+/// @returns 1 if content of the widget must not be traversed, 0 otherwise
+typedef int (*FjWidgetFn)(struct FjWidget *wgt, void *data);
 
 /**
  * @brief Performs a depth-first widget tree traversal.

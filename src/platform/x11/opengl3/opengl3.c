@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 
-#include <fejix_private/opengl3_generic.h>
+#include <fejix_private/opengl/opengl3_generic.h>
 
 #include <malloc.h>
 
