@@ -3,38 +3,33 @@
 #include <fejix_private/layout.h>
 #include <fejix_private/traverse_widgets.h>
 
-static int layoutMax(struct FjWidget *wgt, void *data) {
+static int layoutMaxMin(struct FjWidget *wgt, int down, void *data) {
     if (wgt->layout == NULL)
         return 1;
     
-    wgt->layout(wgt, FJ_LAYOUT_MAX);
+    wgt->layout(wgt, down ? FJ_LAYOUT_MAX : FJ_LAYOUT_MIN);
 
     return 0;
 }
 
-static int layoutMin(struct FjWidget *wgt, void *data) {
+static int layoutExact(struct FjWidget *wgt, int down, void *data) {
     if (wgt->layout == NULL)
         return 1;
     
-    wgt->layout(wgt, FJ_LAYOUT_MIN);
-
-    return 0;
-}
-
-static int layoutExact(struct FjWidget *wgt, void *data) {
-    if (wgt->layout == NULL)
-        return 1;
-    
-    wgt->layout(wgt, FJ_LAYOUT_EXACT);
+    if (down)
+        wgt->layout(wgt, FJ_LAYOUT_EXACT);
 
     return 0;
 }
 
 void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
 {
+    if (root == NULL)
+        return;
+        
     root->_geometry.w = windowW;
     root->_geometry.h = windowH;
 
-    fjTraverseWidgets(root, &layoutMax, &layoutMin, NULL);
-    fjTraverseWidgets(root, &layoutExact, NULL, NULL);
+    fjTraverseWidgets(root, &layoutMaxMin, NULL);
+    fjTraverseWidgets(root, &layoutExact, NULL);
 }

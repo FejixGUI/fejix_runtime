@@ -14,8 +14,7 @@ void fjAppSetWindows(
 
 void fjTraverseWidgets(
     struct FjWidget *root,
-    FjWidgetFn downFn,
-    FjWidgetFn upFn,
+    FjWidgetFn widgetFn,
     void *data
 )
 {
@@ -38,8 +37,8 @@ void fjTraverseWidgets(
         
         // This widget is visited the first time
         if (I(wgt) == 0)
-            if (downFn != NULL) {
-                int doNotTraverseContent = downFn(wgt, data);
+            if (widgetFn != NULL) {
+                int doNotTraverseContent = widgetFn(wgt, 1, data);
                 if (!doNotTraverseContent)
                     I(wgt) = L(wgt); // Pretent that we finished this node
             }
@@ -47,7 +46,7 @@ void fjTraverseWidgets(
         // We are finished with this widget [and its content]
         if (I(wgt) == L(wgt)) {
             I(wgt) = 0; // Clean up
-            if (upFn != NULL) upFn(wgt, data);
+            if (widgetFn != NULL) widgetFn(wgt, 1, data);
             wgt = wgt->container; // Go up the tree
             continue;
         }

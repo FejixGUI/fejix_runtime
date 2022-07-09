@@ -3,8 +3,9 @@
 
 struct FjWidget;
 
+/// @param down 1 if the wgt is discovered (currently going down), 0 otherwise
 /// @returns 1 if content of the widget must not be traversed, 0 otherwise
-typedef int (*FjWidgetFn)(struct FjWidget *wgt, void *data);
+typedef int (*FjWidgetFn)(struct FjWidget *wgt, int down, void *data);
 
 /**
  * @brief Performs a depth-first widget tree traversal.
@@ -16,8 +17,7 @@ typedef int (*FjWidgetFn)(struct FjWidget *wgt, void *data);
  */
 void fjTraverseWidgets(
     struct FjWidget *root,
-    FjWidgetFn downFn,
-    FjWidgetFn upFn,
+    FjWidgetFn widgetFn,
     void *data
 );
 
