@@ -40,7 +40,10 @@ struct FjBackend {
         uint32_t height
     );
 
-    struct FjDrawContext* (*getWindowDrawContext)(SELF, struct FjWindow *win);
+    struct FjDrawContext* (*getWindowDrawContext)(
+        SELF,
+        struct FjWindow *win
+    );
 
 #undef SELF
 };

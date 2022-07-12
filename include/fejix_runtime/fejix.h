@@ -25,46 +25,6 @@
 
 
 
-/**
- * @brief GUI application parameters
- * 
- */
-struct FjAppParams {
-    /// Primary backend
-    uint32_t backend0;
-
-    /// Fallback backend
-    uint32_t backend1;
-};
-
-
-/**
- * @brief Window parameters
- * 
- */
-struct FjWindowParams {
-    /// Initial width of the window; mandatory to set
-    uint32_t width;
-    /// Initial height of the window; mandatory to set
-    uint32_t height;
-
-    /// Minimal width; set to 0 to ignore
-    uint32_t minWidth;  
-    /// Minimal height; set to 0 to ignore
-    uint32_t minHeight; 
-
-    /// Maximum width; set to 0 to ignore
-    uint32_t maxWidth;  
-    /// Maximum height; set to 0 to ignore
-    uint32_t maxHeight; 
-
-    /**
-     * When 0, indicates that the window must not be resizable or maximizable 
-     */
-    unsigned isResizable: 1;
-};
-
-
 
 
 /**
@@ -139,27 +99,6 @@ void fjLoop(
 );
 
 
-
-
-struct FjWidget {
-    struct FjWidget *container; // Parent
-    struct FjWidget **content;  // Children
-
-    void *data;                 // Widget's local data
-
-    struct FjConstraints constraints;     // Min/Max sizes
-    struct FjConstraints _tmpConstraints; // For layout calculation
-    struct FjGeometry geometry;          // X/Y/W/H
-    struct FjXY weights;                  // Growing coefficients
-
-    uint32_t contentLength;     // Number of children
-    uint32_t _contentIndex;     // Used during layout traversal
-
-    // Functions
-    FjLayoutFn layout;
-    FjDrawFn draw;
-    // FjCursorHandlerFn handle;
-};
 
 
 #ifdef __cplusplus

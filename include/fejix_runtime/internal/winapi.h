@@ -2,7 +2,7 @@
 #define _FEJIX_WINAPI_H_
 
 
-#include <fejix_runtime/fejix_defines.h>
+#include <fejix_runtime/definitions.h>
 
 // How on Earth do we have a piece of software that doesn't know about Unicode?
 // Note that later in code we will use the fact that WinAPI uses Unicode.

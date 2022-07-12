@@ -19,6 +19,8 @@
     _ALIAS(FjConstraints);
     _ALIAS(FjGeometry);
     _ALIAS(FjXY);
+
+    _ALIAS(FjStdLinearLayoutData)
 #endif
 
 #undef _ALIAS

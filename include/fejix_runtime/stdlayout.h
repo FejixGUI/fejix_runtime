@@ -3,27 +3,32 @@
 
 #include <fejix_runtime/definitions.h>
 
-struct FjWidget;
+#define FJ_HORIZONTAL 0
+#define FJ_VERTICAL   1
+
 
 void fjStdRootLayout(struct FjWidget *self, uint32_t mode);
 void fjStdSelfLayout(struct FjWidget *self, uint32_t mode);
 
 
 /// Row | Column
-struct FjStdRowData {
+struct FjStdLinearLayoutData {
     /// FJ_HORIZONTAL or FJ_VERTICAL
     uint32_t orientation;
 
     /// Space between elements
     uint32_t spacing;
 
-    /// Vertical and horizontal space between elements and row
+    /// Vertical and horizontal space around the elements
     struct FjXY padding;
+
+    // Minimum size of content along the main axis
+    uint32_t _minSize;
+
+    // Exact size of padding+spacing along the main axis
+    uint32_t _spaceSize;
 };
 
-#define FJ_HORIZONTAL 0
-#define FJ_VERTICAL   1
-
-void fjStdRowLayout(struct FjWidget *self, uint32_t mode);
+void fjStdLinearLayout(struct FjWidget *self, uint32_t mode);
 
 #endif // _FEJIX_STDLAYOUT_H_

@@ -1,6 +1,7 @@
 target_sources(fejix_runtime
     PRIVATE
     "${ROOT}/src/generic.c"
+    "${ROOT}/src/traverse_widgets.c"
     "${ROOT}/src/drawing.c"
     "${ROOT}/src/layout.c"
     "${ROOT}/src/stdlayout.c"
