@@ -65,9 +65,14 @@ struct FjGeometry {
     int32_t h;
 };
 
-struct FjXY {
+struct FjPoint {
     int32_t x;
     int32_t y;
+};
+
+struct FjPointF {
+    float x;
+    float y;
 };
 
 /// The value that should be used for W/H of infinitely big widgets
@@ -122,8 +127,8 @@ struct FjWidget {
 
     struct FjConstraints constraints;     // Min/Max sizes
     struct FjConstraints _tmpConstraints; // For layout calculation
-    struct FjGeometry geometry;          // X/Y/W/H
-    struct FjXY weights;                  // Growing coefficients
+    struct FjGeometry geometry;           // X/Y/W/H
+    struct FjPointF weights;              // Growing coefficients
 
     uint32_t contentLength;     // Number of children
     uint32_t _contentIndex;     // Used during layout traversal

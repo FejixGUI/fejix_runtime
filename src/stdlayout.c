@@ -1,6 +1,8 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/stdlayout.h>
 
+#include <math.h>
+
 // Caution: magic outside Hogwarts
 
 #define CONST_MIN_W(WGT) (WGT)->constraints.minW
@@ -185,19 +187,23 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
         case FJ_LAYOUT_EXACT:
         {
 
+            // If you change the following code, remember to also change
+            // the code for the horizontal layout
             if (data->orientation == FJ_VERTICAL) {
                 int32_t availableH =
                     EXACT_H(self) - data->_spaceSize
                     - data->_minSize;
 
-                int32_t allWeights = 0;
+                float allWeights = 0.f;
                 FOR_EACH_CHILD(self, i) {
                     allWeights += WEIGHT_Y(MY_CHILD(i));
                 }
 
-                double spacePerWeight = (double) availableH / allWeights;
+                double spacePerWeight =
+                    (double) availableH
+                    / (double) allWeights;
 
-                struct FjXY position = {
+                struct FjPoint position = {
                     EXACT_X(self) + data->padding.x,
                     EXACT_Y(self) + data->padding.y
                 };
@@ -211,8 +217,9 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
                         MAX_W(MY_CHILD(i))
                     );
 
-                    int32_t calculatedHeight =
-                        WEIGHT_Y(MY_CHILD(i)) * spacePerWeight;
+                    int32_t calculatedHeight = (int32_t) round(
+                        spacePerWeight * (double) WEIGHT_Y(MY_CHILD(i))
+                    );
 
                     EXACT_H(MY_CHILD(i)) = CONSTRAIN(
                         MIN_H(MY_CHILD(i)) + calculatedHeight,
@@ -228,41 +235,49 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
 
             } else /* FJ_HORIZONTAL */ {
 
-#if 0
-                int32_t availableW = MAX_W(self) - MIN_W(self);
+                int32_t availableW =
+                    EXACT_W(self) - data->_spaceSize
+                    - data->_minSize;
 
-                int32_t allWeights = 0;
+                float allWeights = 0.f;
                 FOR_EACH_CHILD(self, i) {
-                    allWeights += WEIGHT_W(MY_CHILD(i));
+                    allWeights += WEIGHT_X(MY_CHILD(i));
                 }
 
-                double spacePerWeight = (double) availableW / allWeights;
+                double spacePerWeight =
+                    (double) availableW
+                    / (double) allWeights;
 
-                struct FjXY position = {
-                    EXACT_X(self), EXACT_Y(self)
+                struct FjPoint position = {
+                    EXACT_X(self) + data->padding.x,
+                    EXACT_Y(self) + data->padding.y
                 };
 
+                int32_t maxH = EXACT_H(self) - 2 * data->padding.y;
+
                 FOR_EACH_CHILD(self, i) {
-                    EXACT_W(MY_CHILD(i)) = CONSTRAIN(
-                        EXACT_W(self),
-                        MIN_W(MY_CHILD(i)),
-                        MAX_W(MY_CHILD(i))
-                    );
-
-                    int32_t calculatedHeight = WEIGHT_Y(MY_CHILD(i)) * spacePerWeight;
-
-                    EXACT_H(CHILD(self, i)) = CONSTRAIN(
-                        calculatedHeight,
+                    EXACT_H(MY_CHILD(i)) = CONSTRAIN(
+                        maxH,
                         MIN_H(MY_CHILD(i)),
                         MAX_H(MY_CHILD(i))
+                    );
+
+                    int32_t calculatedWidth = (int32_t) round(
+                        spacePerWeight * (double) WEIGHT_Y(MY_CHILD(i))
+                    );
+
+                    EXACT_W(MY_CHILD(i)) = CONSTRAIN(
+                        MIN_W(MY_CHILD(i)) + calculatedWidth,
+                        MIN_W(MY_CHILD(i)),
+                        MAX_W(MY_CHILD(i))
                     );
 
                     EXACT_X(MY_CHILD(i)) = position.x;
                     EXACT_Y(MY_CHILD(i)) = position.y;
 
-                    position.y += calculatedHeight;
+                    position.x += EXACT_W(MY_CHILD(i)) + data->spacing;
                 }
-#endif
+
             } // FJ_HORIZONTAL
 
         } // case FJ_LAYOUT_EXACT

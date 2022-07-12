@@ -8,17 +8,18 @@
 #define _ALIAS(X) typedef struct X X;
 
 #ifdef _FEJIX_H_
-    _ALIAS(FjApp);
-    _ALIAS(FjAppParams);
-    _ALIAS(FjWindow);
-    _ALIAS(FjWindowParams);
-    _ALIAS(FjEvent);
-    _ALIAS(FjWidget);
-    _ALIAS(FjDrawContext);
+    _ALIAS(FjApp)
+    _ALIAS(FjAppParams)
+    _ALIAS(FjWindow)
+    _ALIAS(FjWindowParams)
+    _ALIAS(FjEvent)
+    _ALIAS(FjWidget)
+    _ALIAS(FjDrawContext)
 
-    _ALIAS(FjConstraints);
-    _ALIAS(FjGeometry);
-    _ALIAS(FjXY);
+    _ALIAS(FjConstraints)
+    _ALIAS(FjGeometry)
+    _ALIAS(FjPoint)
+    _ALIAS(FjPointF)
 
     _ALIAS(FjStdLinearLayoutData)
 #endif

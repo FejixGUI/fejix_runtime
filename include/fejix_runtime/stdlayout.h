@@ -20,7 +20,7 @@ struct FjStdLinearLayoutData {
     uint32_t spacing;
 
     /// Vertical and horizontal space around the elements
-    struct FjXY padding;
+    struct FjPoint padding;
 
     // Minimum size of content along the main axis
     uint32_t _minSize;

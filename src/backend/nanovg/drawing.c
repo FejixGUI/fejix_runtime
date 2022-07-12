@@ -58,10 +58,13 @@ void stroke(SELF, float width)
 
 void fjDrawContextInit_nanovg(struct FjDrawContext *ctx)
 {
-    ctx->beginPath = &beginPath;
-    ctx->fill = &fill;
-    ctx->rect = &rect;
-    ctx->rrect = &rrect;
-    ctx->setColor = &setColor;
-    ctx->stroke = &stroke;
+    *ctx = (struct FjDrawContext) {
+        ctx->windowData,
+        &beginPath,
+        &setColor,
+        &rect,
+        &rrect,
+        &fill,
+        &stroke
+    };
 }

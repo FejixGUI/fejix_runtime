@@ -54,9 +54,10 @@ struct FjDrawContext {
     FjBackendWindowData *windowData;
     
 #define SELF struct FjDrawContext *self
+    void (*beginPath)(SELF);
+    
     void (*setColor)(SELF, float r, float g, float b, float a);
 
-    void (*beginPath)(SELF);
     void (*rect)(SELF, int32_t x, int32_t y, int32_t w, int32_t h);
     void (*rrect)(
         SELF,

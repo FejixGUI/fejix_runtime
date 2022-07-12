@@ -39,8 +39,6 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
     return FJ_OK;
 }
 
-FjWidget linearContainer;
-
 void drawRectangle1(FjWidget *self, FjDrawContext *ctx) {
     ctx->beginPath(ctx);
     ctx->rrect(ctx,
@@ -73,7 +71,7 @@ FjWindow win = {0};
 
 FjWidget
     root = {0},
-    // linearContainer = {0},
+    linearContainer = {0},
     wgt1 = {0},
     wgt2 = {0};
 
@@ -113,7 +111,7 @@ int main(void) {
 
     FjWidget *widgets[] = {&wgt1, &wgt2};
     FjStdLinearLayoutData data = {
-        .orientation = FJ_VERTICAL,
+        .orientation = FJ_HORIZONTAL,
         .spacing = 20,
         .padding = {.x=70, .y=70}
     };
@@ -127,13 +125,13 @@ int main(void) {
     wgt1.constraints = (FjConstraints){50,50,500,500};
     wgt1.layout = &fjStdSelfLayout;
     wgt1.draw = &drawRectangle1;
-    wgt1.weights = (FjXY){1,1};
+    wgt1.weights = (FjPointF){1.f, 1.f};
     wgt1.container = &linearContainer;
 
     wgt2.constraints = (FjConstraints){50,50,500,500};
     wgt2.layout = &fjStdSelfLayout;
     wgt2.draw = &drawRectangle2;
-    wgt2.weights = (FjXY){1,1};
+    wgt2.weights = (FjPointF){1.f, 1.f};
     wgt2.container = &linearContainer;
 
     fjWindowSetVisible(&win, true);
