@@ -50,6 +50,10 @@ static inline int32_t max(int32_t a, int32_t b) {
 /// )
 #define CONSTRAIN(_VALUE, _MIN, _MAX) max(min(_VALUE, _MAX), _MIN)
 
+static inline int32_t divround(int32_t a, int32_t b) {
+    return (int32_t) round((double) a / (double) b);
+}
+
 
 
 void fjStdSelfLayout(struct FjWidget *self, uint32_t mode)
@@ -285,3 +289,56 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
     } // switch (mode)
 
 } // fjStdLinearLayout
+
+
+
+void fjStdCenterLayout(struct FjWidget *self, uint32_t mode)
+{
+    if (NO_CONTENT(self))
+        return; // Error
+
+    switch (mode) {
+        case FJ_LAYOUT_MAX:
+            MAX_W(MY_CHILD(0)) = CONSTRAIN(
+                MAX_W(self),
+                CONST_MIN_W(MY_CHILD(0)),
+                CONST_MAX_W(MY_CHILD(0))
+            );
+
+            MAX_H(MY_CHILD(0)) = CONSTRAIN(
+                MAX_H(self),
+                CONST_MIN_H(MY_CHILD(0)),
+                CONST_MAX_H(MY_CHILD(0))
+            );
+        break;
+
+        case FJ_LAYOUT_MIN:
+            MIN_W(self) = MIN_W(MY_CHILD(0));
+            MIN_H(self) = MIN_H(MY_CHILD(0));
+        break;
+
+        case FJ_LAYOUT_EXACT:
+        {
+            EXACT_W(MY_CHILD(0)) = CONSTRAIN(
+                EXACT_W(self),
+                MIN_W(MY_CHILD(0)),
+                MAX_W(MY_CHILD(0))
+            );
+
+            EXACT_H(MY_CHILD(0)) = CONSTRAIN(
+                EXACT_H(self),
+                MIN_H(MY_CHILD(0)),
+                MAX_H(MY_CHILD(0))
+            );
+
+            int32_t myCenterX = EXACT_X(self) + divround(EXACT_W(self), 2);
+            int32_t myCenterY = EXACT_Y(self) + divround(EXACT_H(self), 2);
+            int32_t childHalfW = divround(EXACT_W(MY_CHILD(0)), 2);
+            int32_t childHalfH = divround(EXACT_H(MY_CHILD(0)), 2);
+
+            EXACT_X(MY_CHILD(0)) = myCenterX - childHalfW;
+            EXACT_Y(MY_CHILD(0)) = myCenterY - childHalfH;
+        }
+        break;
+    }
+}

@@ -109,17 +109,12 @@ int main(void) {
     root.contentLength = arrlen(rootContent);
     root.layout = &fjStdRootLayout;
 
-    FjWidget *widgets[] = {&wgt1, &wgt2};
-    FjStdLinearLayoutData data = {
-        .orientation = FJ_HORIZONTAL,
-        .spacing = 20,
-        .padding = {.x=70, .y=70}
-    };
-    linearContainer.layout = &fjStdLinearLayout;
+    FjWidget *widgets[] = {&wgt1};
+    linearContainer.layout = &fjStdCenterLayout;
     linearContainer.content = widgets;
     linearContainer.contentLength = arrlen(widgets);
     linearContainer.container = &root;
-    linearContainer.data = &data;
+    linearContainer.draw = &drawRectangle2;
     linearContainer.constraints = (FjConstraints){0,0,FJ_EXPAND,FJ_EXPAND};
 
     wgt1.constraints = (FjConstraints){50,50,500,500};
@@ -128,11 +123,11 @@ int main(void) {
     wgt1.weights = (FjPointF){1.f, 1.f};
     wgt1.container = &linearContainer;
 
-    wgt2.constraints = (FjConstraints){50,50,500,500};
-    wgt2.layout = &fjStdSelfLayout;
-    wgt2.draw = &drawRectangle2;
-    wgt2.weights = (FjPointF){1.f, 1.f};
-    wgt2.container = &linearContainer;
+    // wgt2.constraints = (FjConstraints){50,50,500,500};
+    // wgt2.layout = &fjStdSelfLayout;
+    // wgt2.draw = &drawRectangle2;
+    // wgt2.weights = (FjPointF){2.f, 2.f};
+    // wgt2.container = &linearContainer;
 
     fjWindowSetVisible(&win, true);
 

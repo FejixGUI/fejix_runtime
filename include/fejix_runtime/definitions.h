@@ -1,5 +1,5 @@
-#ifndef _FEJIX_DEFINES_H_
-#define _FEJIX_DEFINES_H_
+#ifndef _FEJIX_DEFINITIONS_H_
+#define _FEJIX_DEFINITIONS_H_
 
 #include <fejix_runtime/events.h>
 
@@ -25,6 +25,9 @@
 
 #define FJ_BACKEND_NONE         0
 #define FJ_BACKEND_NANOVG       1
+
+#define FJ_HORIZONTAL 0
+#define FJ_VERTICAL   1
 
 
 struct FjWidget;
@@ -139,4 +142,4 @@ struct FjWidget {
     // FjCursorHandlerFn handle;
 };
 
-#endif // _FEJIX_DEFINES_H_
+#endif // _FEJIX_DEFINITIONS_H_

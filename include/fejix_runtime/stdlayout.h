@@ -3,13 +3,6 @@
 
 #include <fejix_runtime/definitions.h>
 
-#define FJ_HORIZONTAL 0
-#define FJ_VERTICAL   1
-
-
-void fjStdRootLayout(struct FjWidget *self, uint32_t mode);
-void fjStdSelfLayout(struct FjWidget *self, uint32_t mode);
-
 
 /// Row | Column
 struct FjStdLinearLayoutData {
@@ -29,6 +22,11 @@ struct FjStdLinearLayoutData {
     uint32_t _spaceSize;
 };
 
+void fjStdRootLayout(struct FjWidget *self, uint32_t mode);
+void fjStdSelfLayout(struct FjWidget *self, uint32_t mode);
 void fjStdLinearLayout(struct FjWidget *self, uint32_t mode);
+void fjStdCenterLayout(struct FjWidget *self, uint32_t mode);
+void fjStdAlignLayout(struct FjWidget *self, uint32_t mode);
+
 
 #endif // _FEJIX_STDLAYOUT_H_
