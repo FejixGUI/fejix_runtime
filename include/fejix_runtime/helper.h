@@ -22,6 +22,7 @@
     _ALIAS(FjPointF)
 
     _ALIAS(FjStdLinearLayoutData)
+    _ALIAS(FjStdAlignLayoutData)
 #endif
 
 #undef _ALIAS

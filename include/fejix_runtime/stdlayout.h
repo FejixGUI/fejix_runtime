@@ -22,6 +22,17 @@ struct FjStdLinearLayoutData {
     uint32_t _spaceSize;
 };
 
+struct FjStdAlignLayoutData {
+    /// FJ_LEFT | FJ_XCENTER | FJ_RIGHT
+    unsigned xalign: 2;
+
+    /// FJ_TOP | FJ_YCENTER | FJ_BOTTOM
+    unsigned yalign: 2;
+
+    unsigned _unused0: 4;
+    uint8_t _unused1;
+};
+
 void fjStdRootLayout(struct FjWidget *self, uint32_t mode);
 void fjStdSelfLayout(struct FjWidget *self, uint32_t mode);
 void fjStdLinearLayout(struct FjWidget *self, uint32_t mode);

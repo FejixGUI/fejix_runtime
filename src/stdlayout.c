@@ -342,3 +342,90 @@ void fjStdCenterLayout(struct FjWidget *self, uint32_t mode)
         break;
     }
 }
+
+
+void fjStdAlignLayout(struct FjWidget *self, uint32_t mode)
+{
+    if (NO_CONTENT(self))
+        return;
+
+    if (self->data == NULL)
+        return;
+
+    struct FjStdAlignLayoutData *data = self->data;
+
+    switch (mode) {
+        case FJ_LAYOUT_MAX:
+            MAX_W(MY_CHILD(0)) = CONSTRAIN(
+                MAX_W(self),
+                CONST_MIN_W(MY_CHILD(0)),
+                CONST_MAX_W(MY_CHILD(0))
+            );
+
+            MAX_H(MY_CHILD(0)) = CONSTRAIN(
+                MAX_H(self),
+                CONST_MIN_H(MY_CHILD(0)),
+                CONST_MAX_H(MY_CHILD(0))
+            );
+        break;
+
+        case FJ_LAYOUT_MIN:
+            MIN_W(self) = MIN_W(MY_CHILD(0));
+            MIN_H(self) = MIN_H(MY_CHILD(0));
+        break;
+
+        case FJ_LAYOUT_EXACT:
+        {
+            EXACT_W(MY_CHILD(0)) = CONSTRAIN(
+                EXACT_W(self),
+                MIN_W(MY_CHILD(0)),
+                MAX_W(MY_CHILD(0))
+            );
+
+            EXACT_H(MY_CHILD(0)) = CONSTRAIN(
+                EXACT_H(self),
+                MIN_H(MY_CHILD(0)),
+                MAX_H(MY_CHILD(0))
+            );
+
+            switch (data->xalign) {
+            case FJ_LEFT:
+                EXACT_X(MY_CHILD(0)) = EXACT_X(self);
+            break;
+
+            case FJ_XCENTER:
+            {
+                int32_t myCenterX = EXACT_X(self) + divround(EXACT_W(self), 2);
+                int32_t childHalfW = divround(EXACT_W(MY_CHILD(0)), 2);
+                EXACT_X(MY_CHILD(0)) = myCenterX - childHalfW;
+            }
+            break;
+
+            case FJ_RIGHT:
+                EXACT_X(MY_CHILD(0)) =
+                    EXACT_X(self) + EXACT_W(self) - EXACT_W(MY_CHILD(0));
+            break;
+            }
+
+            switch (data->yalign) {
+            case FJ_TOP:
+                EXACT_Y(MY_CHILD(0)) = EXACT_Y(self);
+            break;
+
+            case FJ_YCENTER:
+            {
+                int32_t myCenterY = EXACT_Y(self) + divround(EXACT_H(self), 2);
+                int32_t childHalfH = divround(EXACT_H(MY_CHILD(0)), 2);
+                EXACT_Y(MY_CHILD(0)) = myCenterY - childHalfH;
+            }
+            break;
+
+            case FJ_BOTTOM:
+                EXACT_Y(MY_CHILD(0)) =
+                    EXACT_Y(self) + EXACT_H(self) - EXACT_H(MY_CHILD(0));
+            break;
+            }
+        }
+        break;
+    }
+}

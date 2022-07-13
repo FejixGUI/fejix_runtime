@@ -26,9 +26,6 @@
 #define FJ_BACKEND_NONE         0
 #define FJ_BACKEND_NANOVG       1
 
-#define FJ_HORIZONTAL 0
-#define FJ_VERTICAL   1
-
 
 struct FjWidget;
 struct FjWindow;
@@ -141,5 +138,16 @@ struct FjWidget {
     FjDrawFn draw;
     // FjCursorHandlerFn handle;
 };
+
+#define FJ_HORIZONTAL 0
+#define FJ_VERTICAL   1
+
+#define FJ_TOP      0b00
+#define FJ_YCENTER  0b01
+#define FJ_BOTTOM   0b10
+
+#define FJ_LEFT     0b00
+#define FJ_XCENTER  0b01
+#define FJ_RIGHT    0b10
 
 #endif // _FEJIX_DEFINITIONS_H_
