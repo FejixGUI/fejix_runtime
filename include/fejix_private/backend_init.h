@@ -2,7 +2,7 @@
 #define _FEJIX_PRIVATE_BACKEND_INIT_H_
 
 #include <fejix_runtime/definitions.h>
-#include <fejix_runtime/internal/backend.h>
+#include <fejix_runtime/backend.h>
 
 struct FjBackendParams {
     struct FjApp *app;
@@ -10,6 +10,10 @@ struct FjBackendParams {
     uint32_t backend1;
 };
 
-uint32_t fjBackendInitApp(struct FjApp *app, struct FjBackend *backend, struct FjBackendParams *params);
+uint32_t fjBackendInitApp(
+    struct FjApp *app,
+    struct FjBackend *backend,
+    struct FjBackendParams *params
+);
 
 #endif // _FEJIX_PRIVATE_BACKEND_INIT_H_

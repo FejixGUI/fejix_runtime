@@ -1,4 +1,4 @@
-#include <fejix_runtime/internal/backend.h>
+#include <fejix_runtime/backend.h>
 
 #include <fejix_private/nanovg/drawing.h>
 #include <fejix_private/nanovg/nanovg.h>

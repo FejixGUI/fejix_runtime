@@ -94,8 +94,7 @@ int main(void) {
     FjWindowParams winParams = {
         .width = 800,
         .height = 600,
-        .minWidth = 100,
-        .minHeight = 70,
+        .constraints = {.minW = 100, .minH = 70},
         .isResizable = 1
     };
 
@@ -110,26 +109,18 @@ int main(void) {
     root.layout = &fjStdRootLayout;
 
     FjWidget *widgets[] = {&wgt1};
-    container.layout = &fjStdAlignLayout;
+    container.layout = &fjStdConstrainLayout;
     container.content = widgets;
     container.contentLength = arrlen(widgets);
     container.container = &root;
     container.draw = &drawRectangle2;
-    container.constraints = (FjConstraints){0,0,FJ_EXPAND,FJ_EXPAND};
-    FjStdAlignLayoutData contData = {.xalign=FJ_XCENTER, .yalign=FJ_BOTTOM};
+    FjConstraints contData = {.maxW = FJ_BIG, .maxH = 200};
     container.data = &contData;
 
-    wgt1.constraints = (FjConstraints){50,50,500,500};
-    wgt1.layout = &fjStdSelfLayout;
+    wgt1.layout = &fjStdNoLayout;
     wgt1.draw = &drawRectangle1;
-    wgt1.weights = (FjPointF){1.f, 1.f};
+    wgt1.weight = 1.f;
     wgt1.container = &container;
-
-    // wgt2.constraints = (FjConstraints){50,50,500,500};
-    // wgt2.layout = &fjStdSelfLayout;
-    // wgt2.draw = &drawRectangle2;
-    // wgt2.weights = (FjPointF){2.f, 2.f};
-    // wgt2.container = &container;
 
     fjWindowSetVisible(&win, true);
 

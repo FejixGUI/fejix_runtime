@@ -2,7 +2,7 @@
 #define _FEJIX_PRIVATE_NANOVG_H_
 
 #include <fejix_runtime/definitions.h>
-#include <fejix_runtime/internal/backend.h>
+#include <fejix_runtime/backend.h>
 
 #include <fejix_private/opengl/opengl3_generic.h>
 

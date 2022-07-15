@@ -1,16 +1,21 @@
+/**
+ * @file
+ * @brief The most important definitions.
+ */
+
 #ifndef _FEJIX_DEFINITIONS_H_
 #define _FEJIX_DEFINITIONS_H_
 
 #include <fejix_runtime/events.h>
+#include <fejix_runtime/backend.h>
 
 #include <stdint.h>
 #include <stddef.h>
 
-
+// Version of Fejix Runtime
 #define FJ_VERSION_MAJOR 0
 #define FJ_VERSION_MINOR 0
 #define FJ_VERSION_PATCH 1
-
 
 // Error codes
 #define FJ_OK                       0
@@ -22,15 +27,38 @@
 #define FJ_ERR_INVALID_ENCODING     6
 #define FJ_ERR_FEATURE_NOT_COMPILED 7
 
-
+// Backend identifiers
 #define FJ_BACKEND_NONE         0
 #define FJ_BACKEND_NANOVG       1
+
+// Layout modes
+#define FJ_LAYOUT_MAX   0
+#define FJ_LAYOUT_MIN   1
+#define FJ_LAYOUT_EXACT 2
+
+// Convenience macro that stands for "infinitely big size (W/H)"
+#define FJ_BIG INT32_MAX
+
+// Orientation
+#define FJ_HORIZONTAL 0
+#define FJ_VERTICAL   1
+
+// Vertical alignment
+#define FJ_TOP      0b00
+#define FJ_YCENTER  0b01
+#define FJ_BOTTOM   0b10
+
+// Horizantal alignment
+#define FJ_LEFT     0b00
+#define FJ_XCENTER  0b01
+#define FJ_RIGHT    0b10
 
 
 struct FjWidget;
 struct FjWindow;
 struct FjApp;
 struct FjDrawContext;
+
 
 typedef uint32_t (*FjEventHandler)(
     struct FjWindow *win,
@@ -47,9 +75,16 @@ typedef void (*FjLayoutFn) (
     uint32_t mode
 );
 
-#define FJ_LAYOUT_MAX   0
-#define FJ_LAYOUT_MIN   1
-#define FJ_LAYOUT_EXACT 2
+
+struct FjPoint {
+    int32_t x;
+    int32_t y;
+};
+
+struct FjPointF {
+    float x;
+    float y;
+};
 
 struct FjConstraints {
     int32_t minW;
@@ -64,19 +99,6 @@ struct FjGeometry {
     int32_t w;
     int32_t h;
 };
-
-struct FjPoint {
-    int32_t x;
-    int32_t y;
-};
-
-struct FjPointF {
-    float x;
-    float y;
-};
-
-/// The value that should be used for W/H of infinitely big widgets
-#define FJ_EXPAND INT32_MAX
 
 
 /**
@@ -102,15 +124,8 @@ struct FjWindowParams {
     /// Initial height of the window; mandatory to set
     uint32_t height;
 
-    /// Minimal width; set to 0 to ignore
-    uint32_t minWidth;  
-    /// Minimal height; set to 0 to ignore
-    uint32_t minHeight; 
-
-    /// Maximum width; set to 0 to ignore
-    uint32_t maxWidth;  
-    /// Maximum height; set to 0 to ignore
-    uint32_t maxHeight; 
+    /// Set members to 0 on order to ignore
+    struct FjConstraints constraints;
 
     /**
      * When 0, indicates that the window must not be resizable or maximizable 
@@ -120,34 +135,29 @@ struct FjWindowParams {
 
 
 struct FjWidget {
-    struct FjWidget *container; // Parent
-    struct FjWidget **content;  // Children
+    /// Parent
+    struct FjWidget *container;
+    /// Children
+    struct FjWidget **content;
+    /// Number of children
+    uint32_t contentLength;
+    /// Used during widget tree traversals
+    uint32_t _contentIndex;
 
-    void *data;                 // Widget's local data
+    /// Widget's local data
+    void *data;
 
-    struct FjConstraints constraints;     // Min/Max sizes
-    struct FjConstraints _tmpConstraints; // For layout calculation
-    struct FjGeometry geometry;           // X/Y/W/H
-    struct FjPointF weights;              // Growing coefficients
-
-    uint32_t contentLength;     // Number of children
-    uint32_t _contentIndex;     // Used during layout traversal
-
-    // Functions
+    // Methods
     FjLayoutFn layout;
     FjDrawFn draw;
-    // FjCursorHandlerFn handle;
+
+    /// Min/Max sizes (makes sense only during layout calculation)
+    struct FjConstraints constraints;
+    /// X, Y, width, height
+    struct FjGeometry geometry;
+    /// Flex grow weight
+    float weight;
 };
 
-#define FJ_HORIZONTAL 0
-#define FJ_VERTICAL   1
-
-#define FJ_TOP      0b00
-#define FJ_YCENTER  0b01
-#define FJ_BOTTOM   0b10
-
-#define FJ_LEFT     0b00
-#define FJ_XCENTER  0b01
-#define FJ_RIGHT    0b10
 
 #endif // _FEJIX_DEFINITIONS_H_

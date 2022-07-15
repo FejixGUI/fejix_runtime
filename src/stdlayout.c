@@ -5,23 +5,17 @@
 
 // Caution: magic outside Hogwarts
 
-#define CONST_MIN_W(WGT) (WGT)->constraints.minW
-#define CONST_MIN_H(WGT) (WGT)->constraints.minH
-#define CONST_MAX_W(WGT) (WGT)->constraints.maxW
-#define CONST_MAX_H(WGT) (WGT)->constraints.maxH
+#define MIN_W(WGT) ((WGT)->constraints.minW)
+#define MIN_H(WGT) ((WGT)->constraints.minH)
+#define MAX_W(WGT) ((WGT)->constraints.maxW)
+#define MAX_H(WGT) ((WGT)->constraints.maxH)
 
-#define MIN_W(WGT) (WGT)->_tmpConstraints.minW
-#define MIN_H(WGT) (WGT)->_tmpConstraints.minH
-#define MAX_W(WGT) (WGT)->_tmpConstraints.maxW
-#define MAX_H(WGT) (WGT)->_tmpConstraints.maxH
+#define EXACT_X(WGT) ((WGT)->geometry.x)
+#define EXACT_Y(WGT) ((WGT)->geometry.y)
+#define EXACT_W(WGT) ((WGT)->geometry.w)
+#define EXACT_H(WGT) ((WGT)->geometry.h)
 
-#define EXACT_X(WGT) (WGT)->geometry.x
-#define EXACT_Y(WGT) (WGT)->geometry.y
-#define EXACT_W(WGT) (WGT)->geometry.w
-#define EXACT_H(WGT) (WGT)->geometry.h
-
-#define WEIGHT_X(WGT) (WGT)->weights.x
-#define WEIGHT_Y(WGT) (WGT)->weights.y
+#define WEIGHT(WGT) ((WGT)->weight)
 
 #define LEN(WGT) ((WGT)->contentLength)
 #define NO_CONTENT(WGT) (LEN(WGT) == 0)
@@ -42,13 +36,14 @@ static inline int32_t max(int32_t a, int32_t b) {
     return a > b ? a : b;
 }
 
+/// All people call it `clamp`. I call it `constrain`.
+///
 /// Example usage:
-/// EXACT_W(childWidget) = CONSTRAIN(
-///     EXACT_W(self),
-///     MIN_W(childWidget),
-///     MAX_W(childWidget)
-/// )
-#define CONSTRAIN(_VALUE, _MIN, _MAX) max(min(_VALUE, _MAX), _MIN)
+/// EXACT_W(child) = constrain(EXACT_W(self), MIN_W(child), MAX_W(child))
+static inline
+int32_t constrain(int32_t value, int32_t minBound, int32_t maxBound) {
+    return max(min(value, maxBound), minBound);
+}
 
 static inline int32_t divround(int32_t a, int32_t b) {
     return (int32_t) round((double) a / (double) b);
@@ -56,37 +51,27 @@ static inline int32_t divround(int32_t a, int32_t b) {
 
 
 
-void fjStdSelfLayout(struct FjWidget *self, uint32_t mode)
+void fjStdNoLayout(struct FjWidget *self, uint32_t mode)
 {
-    switch (mode) {
-        case FJ_LAYOUT_MIN:
-            MIN_W(self) = CONST_MIN_W(self);
-            MIN_H(self) = CONST_MIN_H(self);
-        break;
+    if (mode == FJ_LAYOUT_MIN) {
+        MIN_W(self) = 0;
+        MIN_H(self) = 0;
     }
 }
 
-/// Does not use size constraints
+
+
 void fjStdRootLayout(struct FjWidget *self, uint32_t mode)
 {
+
     if (NO_CONTENT(self)) {
-        EXACT_X(self) = 0;
-        EXACT_Y(self) = 0;
         return;
     }
 
     switch (mode) {
         case FJ_LAYOUT_MAX:
-            MAX_W(MY_CHILD(0)) = CONSTRAIN(
-                EXACT_W(self),
-                CONST_MIN_W(MY_CHILD(0)),
-                CONST_MAX_W(MY_CHILD(0))
-            );
-            MAX_H(MY_CHILD(0)) = CONSTRAIN(
-                EXACT_H(self),
-                CONST_MIN_H(MY_CHILD(0)),
-                CONST_MAX_H(MY_CHILD(0))
-            );
+            MAX_W(MY_CHILD(0)) = EXACT_W(self);
+            MAX_H(MY_CHILD(0)) = EXACT_H(self);
         break;
 
         case FJ_LAYOUT_MIN:
@@ -96,27 +81,71 @@ void fjStdRootLayout(struct FjWidget *self, uint32_t mode)
 
         case FJ_LAYOUT_EXACT:
         {
-            EXACT_X(self) = 0;
-            EXACT_Y(self) = 0;
+            EXACT_X(MY_CHILD(0)) = EXACT_X(self);
+            EXACT_Y(MY_CHILD(0)) = EXACT_Y(self);
 
-            EXACT_X(MY_CHILD(0)) = 0;
-            EXACT_Y(MY_CHILD(0)) = 0;
-
+            // TODO Optionally set window's min size to root's min size
             EXACT_W(self) = max(MIN_W(self), EXACT_W(self));
             EXACT_H(self) = max(MIN_H(self), EXACT_H(self));
 
-            EXACT_W(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_W(MY_CHILD(0)) = constrain(
                 EXACT_W(self),
                 MIN_W(MY_CHILD(0)),
                 MAX_W(MY_CHILD(0))
             );
-            EXACT_H(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_H(MY_CHILD(0)) = constrain(
                 EXACT_H(self),
                 MIN_H(MY_CHILD(0)),
                 MAX_H(MY_CHILD(0))
             );
         }
         break;
+    }
+}
+
+
+void fjStdConstrainLayout(struct FjWidget *self, uint32_t mode)
+{
+    if (self->data == NULL)
+        return; // ERROR
+
+    struct FjConstraints cons = *((struct FjConstraints *) self->data);
+
+        switch (mode) {
+            case FJ_LAYOUT_MAX:
+                MAX_W(self) = cons.maxW;
+                MAX_H(self) = cons.maxH;
+            break;
+
+            case FJ_LAYOUT_MIN:
+                if (!NO_CONTENT(self)) {
+                    MIN_W(self) = cons.minW;
+                    MIN_H(self) = cons.minH;
+                } else {
+                    MIN_W(self) = constrain(
+                        MIN_W(MY_CHILD(0)),
+                        cons.minW,
+                        cons.maxW
+                    );
+
+                    MIN_H(self) = constrain(
+                        MIN_H(MY_CHILD(0)), cons.minH, cons.maxH
+                    );
+                }
+            break;
+
+            case FJ_LAYOUT_EXACT:
+                if (!NO_CONTENT(self)) {
+                    EXACT_X(MY_CHILD(0)) = EXACT_X(self);
+                    EXACT_Y(MY_CHILD(0)) = EXACT_Y(self);
+                    EXACT_W(MY_CHILD(0)) = constrain(
+                        EXACT_W(self), MIN_W(MY_CHILD(0)), MAX_W(MY_CHILD(0))
+                    );
+                    EXACT_H(MY_CHILD(0)) = constrain(
+                        EXACT_H(self), MIN_H(MY_CHILD(0)), MAX_H(MY_CHILD(0))
+                    );
+                }
+            break;
     }
 }
 
@@ -141,17 +170,8 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
         case FJ_LAYOUT_MAX:
             FOR_EACH_CHILD(self, i)
             {
-                MAX_W(MY_CHILD(i)) = CONSTRAIN(
-                    MAX_W(self),
-                    CONST_MIN_W(MY_CHILD(i)),
-                    CONST_MAX_W(MY_CHILD(i))
-                );
-
-                MAX_H(MY_CHILD(i)) = CONSTRAIN(
-                    MAX_H(self),
-                    CONST_MIN_H(MY_CHILD(i)),
-                    CONST_MAX_H(MY_CHILD(i))
-                );
+                MAX_W(MY_CHILD(i)) = MAX_W(self);
+                MAX_H(MY_CHILD(i)) = MAX_H(self);
             }
         break;
 
@@ -200,7 +220,7 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
 
                 float allWeights = 0.f;
                 FOR_EACH_CHILD(self, i) {
-                    allWeights += WEIGHT_Y(MY_CHILD(i));
+                    allWeights += WEIGHT(MY_CHILD(i));
                 }
 
                 double spacePerWeight =
@@ -215,17 +235,17 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
                 int32_t maxW = EXACT_W(self) - 2 * data->padding.x;
 
                 FOR_EACH_CHILD(self, i) {
-                    EXACT_W(MY_CHILD(i)) = CONSTRAIN(
+                    EXACT_W(MY_CHILD(i)) = constrain(
                         maxW,
                         MIN_W(MY_CHILD(i)),
                         MAX_W(MY_CHILD(i))
                     );
 
                     int32_t calculatedHeight = (int32_t) round(
-                        spacePerWeight * (double) WEIGHT_Y(MY_CHILD(i))
+                        spacePerWeight * (double) WEIGHT(MY_CHILD(i))
                     );
 
-                    EXACT_H(MY_CHILD(i)) = CONSTRAIN(
+                    EXACT_H(MY_CHILD(i)) = constrain(
                         MIN_H(MY_CHILD(i)) + calculatedHeight,
                         MIN_H(MY_CHILD(i)),
                         MAX_H(MY_CHILD(i))
@@ -245,7 +265,7 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
 
                 float allWeights = 0.f;
                 FOR_EACH_CHILD(self, i) {
-                    allWeights += WEIGHT_X(MY_CHILD(i));
+                    allWeights += WEIGHT(MY_CHILD(i));
                 }
 
                 double spacePerWeight =
@@ -260,17 +280,17 @@ void fjStdLinearLayout(struct FjWidget *self, uint32_t mode)
                 int32_t maxH = EXACT_H(self) - 2 * data->padding.y;
 
                 FOR_EACH_CHILD(self, i) {
-                    EXACT_H(MY_CHILD(i)) = CONSTRAIN(
+                    EXACT_H(MY_CHILD(i)) = constrain(
                         maxH,
                         MIN_H(MY_CHILD(i)),
                         MAX_H(MY_CHILD(i))
                     );
 
                     int32_t calculatedWidth = (int32_t) round(
-                        spacePerWeight * (double) WEIGHT_Y(MY_CHILD(i))
+                        spacePerWeight * (double) WEIGHT(MY_CHILD(i))
                     );
 
-                    EXACT_W(MY_CHILD(i)) = CONSTRAIN(
+                    EXACT_W(MY_CHILD(i)) = constrain(
                         MIN_W(MY_CHILD(i)) + calculatedWidth,
                         MIN_W(MY_CHILD(i)),
                         MAX_W(MY_CHILD(i))
@@ -299,17 +319,8 @@ void fjStdCenterLayout(struct FjWidget *self, uint32_t mode)
 
     switch (mode) {
         case FJ_LAYOUT_MAX:
-            MAX_W(MY_CHILD(0)) = CONSTRAIN(
-                MAX_W(self),
-                CONST_MIN_W(MY_CHILD(0)),
-                CONST_MAX_W(MY_CHILD(0))
-            );
-
-            MAX_H(MY_CHILD(0)) = CONSTRAIN(
-                MAX_H(self),
-                CONST_MIN_H(MY_CHILD(0)),
-                CONST_MAX_H(MY_CHILD(0))
-            );
+            MAX_W(MY_CHILD(0)) = MAX_W(self);
+            MAX_H(MY_CHILD(0)) = MAX_H(self);
         break;
 
         case FJ_LAYOUT_MIN:
@@ -319,13 +330,13 @@ void fjStdCenterLayout(struct FjWidget *self, uint32_t mode)
 
         case FJ_LAYOUT_EXACT:
         {
-            EXACT_W(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_W(MY_CHILD(0)) = constrain(
                 EXACT_W(self),
                 MIN_W(MY_CHILD(0)),
                 MAX_W(MY_CHILD(0))
             );
 
-            EXACT_H(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_H(MY_CHILD(0)) = constrain(
                 EXACT_H(self),
                 MIN_H(MY_CHILD(0)),
                 MAX_H(MY_CHILD(0))
@@ -356,17 +367,8 @@ void fjStdAlignLayout(struct FjWidget *self, uint32_t mode)
 
     switch (mode) {
         case FJ_LAYOUT_MAX:
-            MAX_W(MY_CHILD(0)) = CONSTRAIN(
-                MAX_W(self),
-                CONST_MIN_W(MY_CHILD(0)),
-                CONST_MAX_W(MY_CHILD(0))
-            );
-
-            MAX_H(MY_CHILD(0)) = CONSTRAIN(
-                MAX_H(self),
-                CONST_MIN_H(MY_CHILD(0)),
-                CONST_MAX_H(MY_CHILD(0))
-            );
+            MAX_W(MY_CHILD(0)) = MAX_W(self);
+            MAX_H(MY_CHILD(0)) = MAX_H(self);
         break;
 
         case FJ_LAYOUT_MIN:
@@ -376,13 +378,13 @@ void fjStdAlignLayout(struct FjWidget *self, uint32_t mode)
 
         case FJ_LAYOUT_EXACT:
         {
-            EXACT_W(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_W(MY_CHILD(0)) = constrain(
                 EXACT_W(self),
                 MIN_W(MY_CHILD(0)),
                 MAX_W(MY_CHILD(0))
             );
 
-            EXACT_H(MY_CHILD(0)) = CONSTRAIN(
+            EXACT_H(MY_CHILD(0)) = constrain(
                 EXACT_H(self),
                 MIN_H(MY_CHILD(0)),
                 MAX_H(MY_CHILD(0))

@@ -1,8 +1,6 @@
 /**
- * @file fejix.h
+ * @file
  * @brief Core features of Fejix runtime
- * 
- * This file contains the core features of Fejix runtime.
  * 
  */
 
@@ -30,8 +28,6 @@
 /**
  * @brief Initializes the windowing API and graphical backend associated with
  * the app.
- * 
- * @details Initializer must look for, select and initilize a backend itself.
  * 
  * @param app The Fejix GUI application to initialize.
  * @param params Application parameters

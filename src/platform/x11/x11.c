@@ -1,6 +1,6 @@
 #include <fejix_runtime/fejix.h>
 #include <fejix_runtime/internal/x11.h>
-#include <fejix_runtime/internal/backend.h>
+#include <fejix_runtime/backend.h>
 
 #include <fejix_private/definitions.h>
 #include <fejix_private/backend_init.h>

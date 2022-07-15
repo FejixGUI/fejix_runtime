@@ -27,6 +27,8 @@ void fjLayout(struct FjWidget *root, uint32_t windowW, uint32_t windowH)
     if (root == NULL)
         return;
 
+    root->geometry.x = 0;
+    root->geometry.y = 0;
     root->geometry.w = windowW;
     root->geometry.h = windowH;
 

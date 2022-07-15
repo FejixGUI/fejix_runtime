@@ -6,10 +6,10 @@
 void fjWindowInitParams_x11(struct FjWindow *win, struct FjWindowParams *params)
 {
     uint32_t
-        minW = params->minWidth,
-        minH = params->minHeight,
-        maxW = params->maxWidth,
-        maxH = params->maxHeight;
+        minW = params->constraints.minW,
+        minH = params->constraints.minH,
+        maxW = params->constraints.maxW,
+        maxH = params->constraints.maxH;
 
     if (!params->isResizable) {
         minW = win->width;

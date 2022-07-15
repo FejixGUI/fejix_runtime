@@ -3,7 +3,8 @@
 
 
 #include <fejix_runtime/definitions.h>
-#include <fejix_runtime/internal/backend.h>
+#include <fejix_runtime/backend.h>
+#include <fejix_runtime/events.h>
 
 #include <X11/Xlib-xcb.h>
 #include <xcb/sync.h>
@@ -13,7 +14,7 @@
 #   include <glad/glx.h>
 
 // We are going to include <glad/gl.h> to load OpenGL.
-// If we included <GL/glx.h> it, would include <GL/gl.h>
+// If we included <GL/glx.h>, it would include <GL/gl.h>
 // which is incompatible with <glad/gl.h> 
 // #   include <GL/glx.h>   // <-- So, we do not use this
 #endif
