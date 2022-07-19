@@ -1,21 +1,8 @@
-target_sources(fejix_runtime
-    PRIVATE
+target_include_directories(fejix_runtime PUBLIC "include")
+
+target_sources(fejix_runtime PRIVATE
     "${ROOT}/src/generic.c"
-    "${ROOT}/src/traverse_widgets.c"
-    "${ROOT}/src/drawing.c"
-    "${ROOT}/src/layout.c"
-    "${ROOT}/src/stdlayout.c"
-    "${ROOT}/src/backend/backend_init.c"
 )
-
-
-if(FEJIX_USE_NANOVG)
-    target_sources(
-        fejix_runtime PRIVATE
-        "${ROOT}/src/backend/nanovg/nanovg.c"
-        "${ROOT}/src/backend/nanovg/drawing.c"
-    )
-endif()
 
 
 if(FEJIX_USE_WINAPI)
@@ -39,14 +26,14 @@ if(FEJIX_USE_X11)
     target_sources(
         fejix_runtime PRIVATE
         "${ROOT}/src/platform/x11/x11.c"
-        "${ROOT}/src/platform/x11/window_utils.c"
         "${ROOT}/src/platform/x11/main_loop.c"
+        "${ROOT}/src/platform/x11/utils.c"
     )
 
-    if(FEJIX_USE_OPENGL3)
+    if(FEJIX_USE_OPENGL)
         target_sources(
             fejix_runtime PRIVATE
-            "${ROOT}/src/platform/x11/opengl3/opengl3.c"
+            "${ROOT}/src/platform/x11/opengl/opengl.c"
         )
     endif()
 

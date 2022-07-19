@@ -1,8 +1,7 @@
-#include <fejix_runtime/fejix.h>
+#include <fejix_runtime/fejix_runtime.h>
+#include <fejix_runtime/typedefs.h>
 
-#include <fejix_private/x11/window_utils.h>
-#include <fejix_private/layout.h>
-#include <fejix_private/drawing.h>
+#include <fejix_runtime_dev/x11/utils.h>
 
 #include <malloc.h>
 
@@ -13,10 +12,8 @@
 
 /// Returns: pointer to the window from the list that has the specified ID.
 // If such a window was not found, returns NULL
-static struct FjWindow* findWindowById(
-    struct FjApp *app,
-    xcb_window_t id
-)
+static
+struct FjWindow* findWindowById(FjApp *app, xcb_window_t id)
 {
     for (int i=0; i<app->windowsLen; i++)
         if (app->windows[i]->windowId == id)
@@ -26,19 +23,8 @@ static struct FjWindow* findWindowById(
 }
 
 
-void fjLoop(
-    struct FjApp *app,
-    FjEventHandler handle
-)
+void fjLoop(FjApp *app, FjEventHandlerFn handle)
 {
-    struct FjBackend *backend = &app->backend;
-
-    // Widgets are not layed out initially, so lay them out
-    for (int i=0; i<app->windowsLen; i++) {
-        struct FjWindow *win = app->windows[i];
-        fjLayout(win->root, win->width, win->height);
-    }
-
     for (;;)
     {
         xcb_generic_event_t *event = xcb_wait_for_event(app->connection);
@@ -59,12 +45,12 @@ void fjLoop(
                 if (!win) break;
 
                 // if (exposeEvent->count == 0) {
-                backend->prepareWindow(backend, win, win->width, win->height);
-                fjDraw(win);
+                // backend->prepareWindow(backend, win, win->width, win->height);
+                // fjDraw(win);
 
-                fjWindowIncrSyncCounter_x11(win);
-                backend->presentWindow(backend, win);
-                fjWindowIncrSyncCounter_x11(win);
+                fj_X11_WindowIncrSyncCounter(win);
+                // backend->presentWindow(backend, win);
+                fj_X11_WindowIncrSyncCounter(win);
                 // }
             }
             break;
@@ -82,8 +68,6 @@ void fjLoop(
                 if (win->width != W || win->height != H) {
                     win->width = W;
                     win->height = H;
-                    
-                    fjLayout(win->root, win->width, win->height);
                     
                     ev.eventType = FJ_EVENT_RESIZE;
                     ev.resizeEvent.width = W;

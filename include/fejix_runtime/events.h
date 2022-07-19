@@ -1,14 +1,31 @@
-#ifndef _FEJIX_EVENTS_H_
-#define _FEJIX_EVENTS_H_
+#ifndef FEJIX_RUNTIME_EVENTS_H_
+#define FEJIX_RUNTIME_EVENTS_H_
+
 
 #include <stdint.h>
 
-// Events
-#define FJ_EVENT_CLOSE          1
-#define FJ_EVENT_RESIZE         2
 
-// Responses of event handlers
-#define FJ_EXIT                 1
+// Events
+enum {
+    FJ_EVENT_CLOSE = 1,
+    FJ_EVENT_RESIZE,
+};
+
+struct FjWindow;
+struct FjEvent;
+
+typedef uint32_t (*FjEventHandlerFn)(
+    struct FjWindow *win,
+    struct FjEvent *ev
+);
+
+
+enum {
+    /** Every event handler must response with either FJ_OK or FJ_EXIT.
+     * FJ_EXIT orders the main loop to break.
+     */
+    FJ_EXIT = 1
+};
 
 
 struct FjResizeEvent {
@@ -32,4 +49,4 @@ struct FjEvent {
 };
 
 
-#endif // _FEJIX_EVENTS_H_
+#endif // FEJIX_RUNTIME_EVENTS_H_

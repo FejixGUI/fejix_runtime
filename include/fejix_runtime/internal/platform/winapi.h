@@ -1,5 +1,5 @@
-#ifndef _FEJIX_WINAPI_H_
-#define _FEJIX_WINAPI_H_
+#ifndef FEJIX_WINAPI_H_
+#define FEJIX_WINAPI_H_
 
 
 #include <fejix_runtime/definitions.h>
@@ -61,4 +61,4 @@ struct FjWindow {
 };
 
 
-#endif // _FEJIX_WINAPI_H_
+#endif // FEJIX_WINAPI_H_

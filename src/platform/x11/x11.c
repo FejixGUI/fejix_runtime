@@ -1,10 +1,9 @@
-#include <fejix_runtime/fejix.h>
-#include <fejix_runtime/internal/x11.h>
-#include <fejix_runtime/backend.h>
+#include <fejix_runtime/fejix_runtime.h>
+#include <fejix_runtime/typedefs.h>
+#include <fejix_runtime/internal/platform/x11.h>
 
-#include <fejix_private/definitions.h>
-#include <fejix_private/backend_init.h>
-#include <fejix_private/x11/window_utils.h>
+#include <fejix_runtime_dev/definitions.h>
+#include <fejix_runtime_dev/x11/utils.h>
 
 #include <string.h>
 #include <malloc.h>
@@ -13,11 +12,9 @@
 
 
 
-static uint32_t getAtoms(
-    xcb_connection_t *con,
-    const char **names,
-    xcb_atom_t *atoms,
-    int length
+static
+uint32_t getAtoms(
+    xcb_connection_t *con, const char **names, xcb_atom_t *atoms, int length
 )
 {
     xcb_intern_atom_cookie_t coockies[length];
@@ -43,7 +40,7 @@ static uint32_t getAtoms(
 }
 
 
-uint32_t fjAppInit(struct FjApp *app, struct FjAppParams *params)
+uint32_t fjAppInit(FjApp *app)
 {        
     app->xDisplay = XOpenDisplay(NULL);
 
@@ -74,7 +71,7 @@ uint32_t fjAppInit(struct FjApp *app, struct FjAppParams *params)
         "_NET_WM_SYNC_REQUEST_COUNTER",
     };
 
-    int nAtoms = STATIC_LEN(atom_names);
+    int nAtoms = FJ_STATIC_LEN(atom_names);
     xcb_atom_t atoms[nAtoms];
 
     uint32_t result = getAtoms(app->connection, atom_names, atoms, nAtoms);
@@ -102,19 +99,17 @@ uint32_t fjAppInit(struct FjApp *app, struct FjAppParams *params)
     );
 
     // Initialize backend
+    // struct FjBackendParams backendParams = {0};
+    // backendParams.app = app;
+    // backendParams.backend0 = params->backend0;
+    // backendParams.backend1 = params->backend1;
 
+    // uint32_t status = fjBackendInitApp(app, &app->backend, &backendParams);
 
-    struct FjBackendParams backendParams = {0};
-    backendParams.app = app;
-    backendParams.backend0 = params->backend0;
-    backendParams.backend1 = params->backend1;
-
-    uint32_t status = fjBackendInitApp(app, &app->backend, &backendParams);
-
-    if (status != FJ_OK) {
-        fjAppDestroy(app);
-        return status;
-    }
+    // if (status != FJ_OK) {
+    //     fjAppDestroy(app);
+    //     return status;
+    // }
 
     return FJ_OK;
 }
@@ -123,22 +118,18 @@ uint32_t fjAppInit(struct FjApp *app, struct FjAppParams *params)
 
 void fjAppDestroy(struct FjApp *app)
 {
-    if (app->backend.backendId != FJ_BACKEND_NONE)
-        app->backend.destroy(&app->backend);
+    // if (app->backend.backendId != FJ_BACKEND_NONE)
+    //     app->backend.destroy(&app->backend);
 
     xcb_disconnect(app->connection);
     // Xlib doesn't care about the opened display
     // because it was converted to an XCB connection
-    // XCloseDisplay(app->xDisplay);
+    // // XCloseDisplay(app->xDisplay);
 }
 
 
 
-uint32_t fjAppInitWindow(
-    struct FjApp *app,
-    struct FjWindow *win,
-    struct FjWindowParams *params
-)
+uint32_t fjAppInitWindow(FjApp *app, FjWindow *win, FjWindowParams *params)
 {
     win->app = app;
 
@@ -172,7 +163,7 @@ uint32_t fjAppInitWindow(
     win->width = params->width;
     win->height = params->height;
 
-    fjWindowInitParams_x11(win, params);
+    fj_X11_WindowInitParams(win, params);
 
     xcb_atom_t protocols[] = {
         app->atom_NET_WM_SYNC_REQUEST,
@@ -185,12 +176,12 @@ uint32_t fjAppInitWindow(
         win->windowId,
         app->atom_WM_PROTOCOLS,
         XCB_ATOM_ATOM,
-        SIZEOF_BITS(*protocols),
-        STATIC_LEN(protocols),
+        FJ_SIZEOF_BITS(*protocols),
+        FJ_STATIC_LEN(protocols),
         protocols
     );
 
-    fjWindowInitSyncCounter_x11(win);
+    fj_X11_WindowInitSyncCounter(win);
 
     win->root = NULL;
 
@@ -199,17 +190,17 @@ uint32_t fjAppInitWindow(
 
 
 
-void fjWindowDestroy(struct FjWindow *win)
+void fjWindowDestroy(FjWindow *win)
 {
     struct FjBackend *bk = &win->app->backend;
     bk->destroyWindow(bk, win);
-    fjWindowDestroySyncCounter_x11(win);
+    fj_X11_WindowDestroySyncCounter(win);
     xcb_destroy_window(win->app->connection, win->windowId);
 }
 
 
 
-void fjWindowSetVisible(struct FjWindow *win, uint32_t visible)
+void fjWindowSetVisible(FjWindow *win, uint32_t visible)
 {
     if (visible)
         xcb_map_window(win->app->connection, win->windowId);
@@ -221,7 +212,7 @@ void fjWindowSetVisible(struct FjWindow *win, uint32_t visible)
 }
 
 
-uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
+uint32_t fjWindowSetTitle(FjWindow *win, const char *title)
 {
     xcb_change_property(
         win->app->connection,
@@ -229,7 +220,7 @@ uint32_t fjWindowSetTitle(struct FjWindow *win, const char *title)
         win->windowId,
         win->app->atom_NET_WM_NAME,
         win->app->atom_UTF8_STRING,
-        SIZEOF_BITS(*title),
+        FJ_SIZEOF_BITS(*title),
         strlen(title),
         title
     );

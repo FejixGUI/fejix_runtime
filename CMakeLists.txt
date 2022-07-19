@@ -1,6 +1,6 @@
-# Hi! You are looking at the CMake script for building Fejix.
-# Please, do not do crazy stuff here.
-# This project should be easy to build, so that alternative build systems may be used.
+# Hi! You are looking at the CMake script for building Fejix Runtime.
+# Do not do crazy stuff.
+# This project should be as easy to build as possible.
 
 cmake_minimum_required(VERSION 3.0)
 
@@ -26,10 +26,6 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-# You should always #include <fejix_runtime/...> for public headers
-# You should always #include <fejix_private/...> for private headers
-target_include_directories(fejix_runtime PUBLIC "include")
-
 # Let it decide what C files to use
 include("${ROOT}/tools/cmake/add_sources.cmake")
 
@@ -39,11 +35,11 @@ include("${ROOT}/tools/cmake/add_deps.cmake")
 
 # === TESTS ===
 
-option(BUILD_DEVTEST "Shall I build the development-only test?" OFF)
+option(BUILD_DEVTEST "The executable I use to debug Fejix Runtime" OFF)
 
 if(BUILD_DEVTEST)
-    add_executable(fejix_test "test/main.c")
-    target_sources(fejix_test PRIVATE "test/debug.c")
-    target_include_directories(fejix_test PRIVATE "test")
-    target_link_libraries(fejix_test fejix_runtime)
+    add_executable(fejix_devtest "test/main.c")
+    target_sources(fejix_devtest PRIVATE "test/debug.c")
+    target_include_directories(fejix_devtest PRIVATE "test")
+    target_link_libraries(fejix_devtest fejix_runtime)
 endif()

@@ -1,6 +1,10 @@
-.xmake
-.vscode
-.junk
-.plan
+# All hidden junk
+.*
+
 build
 target
+
+# Added by CMake and friends
+CMakeFiles
+CMakeCache.txt
+Makefile

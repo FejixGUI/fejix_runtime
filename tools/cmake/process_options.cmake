@@ -1,18 +1,19 @@
 option(FEJIX_USE_X11 "Use X11 protocol for window management (Usually, targeting GNU/Linux distros)" OFF)
 option(FEJIX_USE_WINAPI "Use Windows API for window management (Usually, targeting MS Windows)" OFF)
-option(FEJIX_USE_OPENGL3 "Include functionality for setting up OpenGL 3" OFF)
-option(FEJIX_USE_NANOVG "Use NanoVG for rendering" OFF)
+option(FEJIX_USE_OPENGL "Include functionality for setting up OpenGL" OFF)
+option(FEJIX_USE_OPENGL_3 "If FEJIX_USE_OPENGL in ON, signals that OpenGL 3 must be used" OFF)
 
 
 if(FEJIX_USE_WINAPI)
 
     check_include_files("windows.h" FEJIX_HAS_WINAPI)
     if(NOT FEJIX_HAS_WINAPI)
-        message(FATAL_ERROR "No windows.h found!")
+        message(FATAL_ERROR "No 'windows.h' found!")
     endif()
 
     target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_WINAPI")
 endif()
+
 
 if(FEJIX_USE_X11)
 
@@ -34,14 +35,15 @@ if(FEJIX_USE_X11)
 endif()
 
 
-if(FEJIX_USE_NANOVG)
-    if(NOT FEJIX_USE_OPENGL3)
-        message(FATAL_ERROR "NanoVG requires OpenGL3!")
-    endif()
- 
-    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_NANOVG")
-endif()
+if(FEJIX_USE_OPENGL)
+    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_OPENGL")
 
-if(FEJIX_USE_OPENGL3)
-    target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_OPENGL3")
+    if(FEJIX_USE_OPENGL_3)
+        target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_OPENGL_3")
+    endif()
+
+    # The list is to be extended in the future
+    if(NOT FEJIX_USE_OPENGL_3)
+        message(FATAL_ERROR "Please, select one of the following OpenGL versions: 3")
+    endif()
 endif()
