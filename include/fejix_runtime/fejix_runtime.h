@@ -14,6 +14,7 @@
 
 #include <fejix_runtime/definitions.h>
 
+#include <fejix_runtime/internal/features.h>
 #include <fejix_runtime/internal/platform.h>
 
 

@@ -3,7 +3,6 @@
 
 
 #include <fejix_runtime/definitions.h>
-#include <fejix_runtime/events.h>
 
 #ifdef FJ_USE_OPENGL3
 #   include <fejix_runtime/internal/platform/x11/opengl.h>
@@ -11,7 +10,6 @@
 
 #include <X11/Xlib-xcb.h>
 #include <xcb/sync.h>
-#include <xcb/xcb_icccm.h>
 
 
 struct FjApp {
@@ -33,9 +31,6 @@ struct FjApp {
         atom_NET_WM_SYNC_REQUEST,
         atom_NET_WM_SYNC_REQUEST_COUNTER;
 
-    xcb_visualid_t windowVisualId;
-    xcb_colormap_t colormapId;
-
 };
 
 
@@ -43,10 +38,9 @@ struct FjWindow {
     struct FjApp *app;
     void *data;
 
+    xcb_window_t windowId;
     uint32_t width;
     uint32_t height;
-
-    xcb_window_t windowId;
 
     /// Used for synchronizing window redrawing
     /// See https://fishsoup.net/misc/wm-spec-synchronization.html
@@ -58,6 +52,11 @@ struct FjWindow {
     xcb_sync_int64_t syncValue;
 };
 
+
+struct FjWindowParams {
+    xcb_visualid_t windowVisualId;
+    xcb_colormap_t colormapId;
+};
 
 
 #endif // FEJIX_RUNTIME_X11_H_

@@ -1,22 +1,25 @@
 option(FEJIX_USE_X11 "Use X11 protocol for window management (Usually, targeting GNU/Linux distros)" OFF)
 option(FEJIX_USE_WINAPI "Use Windows API for window management (Usually, targeting MS Windows)" OFF)
+option(FEJIX_USE_VARSIZE "Enable VarSize feature" ON)
 option(FEJIX_USE_OPENGL "Include functionality for setting up OpenGL" OFF)
 option(FEJIX_USE_OPENGL_3 "If FEJIX_USE_OPENGL in ON, signals that OpenGL 3 must be used" OFF)
 
 
 if(FEJIX_USE_WINAPI)
-
     check_include_files("windows.h" FEJIX_HAS_WINAPI)
     if(NOT FEJIX_HAS_WINAPI)
         message(FATAL_ERROR "No 'windows.h' found!")
     endif()
 
     target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_WINAPI")
+
+    if(FEJIX_USE_VARSIZE)
+        target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_VARSIZE")
+    endif()
 endif()
 
 
 if(FEJIX_USE_X11)
-
     check_include_files("X11/Xlib.h" FEJIX_HAS_X11)
     check_include_files("xcb/xcb.h" FEJIX_HAS_XCB)
     check_include_files("X11/Xlib-xcb.h" FEJIX_HAS_XLIB_XCB)
@@ -32,6 +35,9 @@ if(FEJIX_USE_X11)
 
     target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_X11")
 
+    if(FEJIX_USE_VARSIZE)
+        target_compile_definitions(fejix_runtime PUBLIC "FJ_USE_VARSIZE")
+    endif()
 endif()
 
 

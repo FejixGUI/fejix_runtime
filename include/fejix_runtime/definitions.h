@@ -17,14 +17,22 @@
 #define FEJIX_RUNTIME_VERSION_MINOR 0
 #define FEJIX_RUNTIME_VERSION_PATCH 1
 
+#define FJ__STR(X) #X
+#define FJ__MAKE_VERSION(MAJ, MIN, PAT) \
+    FJ__STR(MAJ) "." FJ__STR(MIN) "." FJ__STR(PAT)
+
 /// "MAJOR.MINOR.PATCH"
-#define FEJIX_RUNTIME_VERSION_STR    \
-    #FEJIX_RUNTIME_VERSION_MAJOR "." \
-    #FEJIX_RUNTIME_VERSION_MINOR "." \
-    #FEJIX_RUNTIME_VERSION_PATCH 
+#define FEJIX_RUNTIME_VERSION_STRING \
+    FJ__MAKE_VERSION( \
+        FEJIX_RUNTIME_VERSION_MAJOR, \
+        FEJIX_RUNTIME_VERSION_MINOR, \
+        FEJIX_RUNTIME_VERSION_PATCH)
 
 
-// Error codes
+typedef uint32_t FjStatus;
+
+
+// FjStatus possible values
 enum {
     FJ_OK = 0,
 
@@ -42,7 +50,13 @@ enum {
 };
 
 struct FjApp;
+
+/** Every FjWindow must have:
+ * 1. struct FjApp *app;
+ * 2. void *data;
+ */
 struct FjWindow;
+
 struct FjWindowParams;
 
 

@@ -2,8 +2,9 @@
 
 > Work in progress ⌛...
 
-This is a C library for window management with features like OpenGL context
-creation etc.
+This is a C library for window management
+written with GUI in mind
+with features like OpenGL context creation etc.
 
 ## Build
 

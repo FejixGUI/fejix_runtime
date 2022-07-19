@@ -1,6 +1,5 @@
-#include <fejix_runtime/fejix.h>
-#include <fejix_runtime/helper.h>
-#include <fejix_runtime/stdlayout.h>
+#include <fejix_runtime/fejix_runtime.h>
+#include <fejix_runtime/typedefs.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,8 +7,9 @@
 #include <stdbool.h>
 
 #include "debug.h"
+#include "fejix_runtime/internal/platform.h"
 
-#define arrlen(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
+#define arrlen(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 
 
 uint32_t handleEvent(FjWindow *win, FjEvent *ev)
@@ -39,88 +39,26 @@ uint32_t handleEvent(FjWindow *win, FjEvent *ev)
     return FJ_OK;
 }
 
-void drawRectangle1(FjWidget *self, FjDrawContext *ctx) {
-    ctx->beginPath(ctx);
-    ctx->rrect(ctx,
-        self->geometry.x,
-        self->geometry.y,
-        self->geometry.w,
-        self->geometry.h,
-        20.0f
-    );
-    ctx->setColor(ctx, 1.0f, 0.7f, 0.0f, 1.0f);
-    ctx->fill(ctx);
-}
 
-void drawRectangle2(FjWidget *self, FjDrawContext *ctx) {
-    ctx->beginPath(ctx);
-    ctx->rrect(ctx,
-        self->geometry.x,
-        self->geometry.y,
-        self->geometry.w,
-        self->geometry.h,
-        20.0f
-    );
-    ctx->setColor(ctx, 0.0f, 0.5f, 1.0f, 1.0f);
-    ctx->fill(ctx);
-}
-
-
-FjApp app = {0};
-FjWindow win = {0};
-
-FjWidget
-    root = {0},
-    container = {0},
-    wgt1 = {0},
-    wgt2 = {0};
-
-
+FjApp app;
+FjWindow win;
+FjWindowParams params;
 
 
 int main(void) {
     printf(
-        "Devtest is running Fejix v%d.%d.%d\n",
-        FJ_VERSION_MAJOR, FJ_VERSION_MINOR, FJ_VERSION_PATCH
+        "Devtest is running Fejix v%s\n",
+        FEJIX_RUNTIME_VERSION_STRING
     );
 
-    FjAppParams appParams = {
-        .backend0 = FJ_BACKEND_NANOVG,
-        .backend1 = FJ_BACKEND_NONE
-    };
+    _(fjAppInit(&app));
 
-    _(fjAppInit(&app, &appParams));
+    _(fjWindowParamsInit(&app, &params));
+    _(fjWindowInit(&app, &win, &params));
 
-    FjWindowParams winParams = {
-        .width = 800,
-        .height = 600,
-        .constraints = {.minW = 100, .minH = 70},
-        .isResizable = 1
-    };
-
-    _(fjAppInitWindow(&app, &win, &winParams));
-
-    _(fjWindowSetTitle(&win, "Це працює!"));
-
-    win.root = &root;
-    FjWidget *rootContent[] = {&container};
-    root.content = rootContent;
-    root.contentLength = arrlen(rootContent);
-    root.layout = &fjStdRootLayout;
-
-    FjWidget *widgets[] = {&wgt1};
-    container.layout = &fjStdConstrainLayout;
-    container.content = widgets;
-    container.contentLength = arrlen(widgets);
-    container.container = &root;
-    container.draw = &drawRectangle2;
-    FjConstraints contData = {.maxW = FJ_BIG, .maxH = 200};
-    container.data = &contData;
-
-    wgt1.layout = &fjStdNoLayout;
-    wgt1.draw = &drawRectangle1;
-    wgt1.weight = 1.f;
-    wgt1.container = &container;
+    fj_Varsize_SetWindowSize(&win, 800, 600);
+    fj_Varsize_SetWindowSizeMin(&win, 200, 150);
+    fj_Varsize_SetWindowSizeMax(&win, 1000, 900);
 
     fjWindowSetVisible(&win, true);
 
@@ -130,6 +68,7 @@ int main(void) {
 
     fjWindowDestroy(&win);
 
+    fjWindowParamsDestroy(&app, &params);
     fjAppDestroy(&app);
 
     return 0;

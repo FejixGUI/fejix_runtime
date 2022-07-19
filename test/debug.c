@@ -12,18 +12,6 @@ void checkFj(const char *file, int line, int value)
     case FJ_OK:
         return;
     
-    case FJ_ERR_BACKEND_FAILED:
-        out("Backend error");
-        break;
-
-    case FJ_ERR_BACKEND_UNKNOWN:
-        out("Unknown backend");
-        break;
-    
-    case FJ_ERR_INVALID_ENCODING:
-        out("Invalid encoding");
-        break;
-
     case FJ_ERR_INVALID_PARAM:
         out("Invalid function parameter");
         break;
@@ -36,8 +24,8 @@ void checkFj(const char *file, int line, int value)
         out("Window manager API failed");
         break;
 
-    case FJ_ERR_FEATURE_NOT_COMPILED:
-        out("Feature is not compiled (perhaps, define FJ_USE_X)");
+    case FJ_ERR_GAPI_FAILED:
+        out("Backend error");
         break;
 
     default:

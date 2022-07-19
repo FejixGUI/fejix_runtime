@@ -1,7 +1,7 @@
 #ifndef FEJIX_RUNTIME_DEV_DEFINITIONS_H_
 #define FEJIX_RUNTIME_DEV_DEFINITIONS_H_
 
-#define FJ_STATIC_LEN(ARRAY) (sizeof(ARRAY) / sizeof(*(ARRAY)))
+#define FJ_STATIC_LEN(ARRAY) (sizeof(ARRAY) / sizeof((ARRAY)[0]))
 #define FJ_SIZEOF_BITS(OBJECT) (sizeof(OBJECT) * 8)
 
 #endif // FEJIX_RUNTIME_DEV_DEFINITIONS_H_

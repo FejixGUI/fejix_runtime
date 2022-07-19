@@ -15,7 +15,7 @@
  * @param params Application parameters
  * @return uint32_t status, FJ_OK if succeeds, error code otherwise.
  */
-uint32_t fjAppInit(
+FjStatus fjAppInit(
     struct FjApp *app
 );
 
@@ -23,7 +23,17 @@ void fjAppDestroy(
     struct FjApp *app
 );
 
-uint32_t fjAppInitWindow(
+FjStatus fjWindowParamsInit(
+    struct FjApp *app,
+    struct FjWindowParams *params
+);
+
+void fjWindowParamsDestroy(
+    struct FjApp *app,
+    struct FjWindowParams *params
+);
+
+FjStatus fjWindowInit(
     struct FjApp *app,
     struct FjWindow *window,
     struct FjWindowParams *params
@@ -58,7 +68,7 @@ void fjWindowSetVisible(
  * @param title UTF-8 string ending with a NULL-terminator
  * @return FJ_OK or error code
  */
-uint32_t fjWindowSetTitle(
+FjStatus fjWindowSetTitle(
     struct FjWindow *window,
     const char *title
 );

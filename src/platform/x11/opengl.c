@@ -1,6 +1,7 @@
-#include <fejix_runtime/fejix.h>
-
-#include <fejix_private/opengl/opengl3_generic.h>
+#include <fejix_runtime/fejix_runtime.h>
+#include <fejix_runtime/typedefs.h>
+#include <fejix_runtime/internal/features/opengl.h>
+#include <fejix_runtime/internal/platform/x11/opengl.h>
 
 #include <malloc.h>
 

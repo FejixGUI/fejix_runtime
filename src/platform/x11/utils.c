@@ -4,44 +4,6 @@
 #include <fejix_runtime_dev/definitions.h>
 #include <fejix_runtime_dev/x11/utils.h>
 
-void fj_X11_WindowInitParams(FjWindow *win, FjWindowParams *params)
-{
-    uint32_t
-        minW = params->constraints.minW,
-        minH = params->constraints.minH,
-        maxW = params->constraints.maxW,
-        maxH = params->constraints.maxH;
-
-    if (!params->isResizable) {
-        minW = win->width;
-        minH = win->height;
-        maxW = win->width;
-        maxH = win->height;
-    }
-
-    xcb_size_hints_t sizeHints = {0};
-    if (minW != 0 || minH != 0)
-        xcb_icccm_size_hints_set_min_size(
-            &sizeHints,
-            minW,
-            minH
-        );
-
-    if (maxW != 0 || maxH != 0)
-        xcb_icccm_size_hints_set_max_size(
-            &sizeHints,
-            maxW,
-            maxH
-        );
-
-    xcb_icccm_set_wm_size_hints(
-        win->app->connection,
-        win->windowId,
-        XCB_ATOM_WM_NORMAL_HINTS,
-        &sizeHints
-    );
-}
-
 
 
 void fj_X11_WindowInitSyncCounter(struct FjWindow *win)

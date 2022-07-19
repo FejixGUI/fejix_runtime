@@ -14,12 +14,12 @@
 #include <fejix_runtime/internal/features/opengl.h>
 
 
-struct FjBackendAppData_opengl3 {
+struct Fj_Opengl_AppData {
     GLXFBConfig framebufferConfig;
 };
 
 
-struct FjBackendWindowData_opengl3 {
+struct Fj_Opengl_WindowData {
     GLXWindow glxwin;
     GLXContext glctx;
 };

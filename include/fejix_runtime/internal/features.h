@@ -6,5 +6,9 @@
 #   include <fejix_runtime/internal/features/opengl.h>
 #endif
 
+#ifdef FJ_USE_VARSIZE
+#   include <fejix_runtime/internal/features/varsize.h>
+#endif
+
 
 #endif // FEJIX_RUNTIME_FEATURES_H_

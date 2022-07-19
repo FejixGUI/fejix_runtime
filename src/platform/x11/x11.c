@@ -7,13 +7,11 @@
 
 #include <string.h>
 #include <malloc.h>
-
-
-
+#include <xcb/xproto.h>
 
 
 static
-uint32_t getAtoms(
+FjStatus getAtoms(
     xcb_connection_t *con, const char **names, xcb_atom_t *atoms, int length
 )
 {
@@ -40,7 +38,7 @@ uint32_t getAtoms(
 }
 
 
-uint32_t fjAppInit(FjApp *app)
+FjStatus fjAppInit(FjApp *app)
 {        
     app->xDisplay = XOpenDisplay(NULL);
 
@@ -85,32 +83,6 @@ uint32_t fjAppInit(FjApp *app)
     app->atom_NET_WM_SYNC_REQUEST = atoms[4];
     app->atom_NET_WM_SYNC_REQUEST_COUNTER = atoms[5];
 
-    // This may be reassigned later by backend initializer
-    app->windowVisualId = app->screen->root_visual;
-
-    app->colormapId = xcb_generate_id(app->connection);
-
-    xcb_create_colormap(
-        app->connection,
-        XCB_COLORMAP_ALLOC_NONE,
-        app->colormapId,
-        app->screen->root,
-        app->windowVisualId
-    );
-
-    // Initialize backend
-    // struct FjBackendParams backendParams = {0};
-    // backendParams.app = app;
-    // backendParams.backend0 = params->backend0;
-    // backendParams.backend1 = params->backend1;
-
-    // uint32_t status = fjBackendInitApp(app, &app->backend, &backendParams);
-
-    // if (status != FJ_OK) {
-    //     fjAppDestroy(app);
-    //     return status;
-    // }
-
     return FJ_OK;
 }
 
@@ -118,9 +90,6 @@ uint32_t fjAppInit(FjApp *app)
 
 void fjAppDestroy(struct FjApp *app)
 {
-    // if (app->backend.backendId != FJ_BACKEND_NONE)
-    //     app->backend.destroy(&app->backend);
-
     xcb_disconnect(app->connection);
     // Xlib doesn't care about the opened display
     // because it was converted to an XCB connection
@@ -128,8 +97,33 @@ void fjAppDestroy(struct FjApp *app)
 }
 
 
+FjStatus fjWindowParamsInit(FjApp *app, FjWindowParams *params)
+{
+    // This may be reassigned later by backend initializer
+    params->windowVisualId = app->screen->root_visual;
 
-uint32_t fjAppInitWindow(FjApp *app, FjWindow *win, FjWindowParams *params)
+    params->colormapId = xcb_generate_id(app->connection);
+
+    xcb_create_colormap(
+        app->connection,
+        XCB_COLORMAP_ALLOC_NONE,
+        params->colormapId,
+        app->screen->root,
+        params->windowVisualId
+    );
+
+    return FJ_OK;
+}
+
+
+void fjWindowParamsDestroy(FjApp *app, FjWindowParams *params)
+{
+    xcb_free_colormap(app->connection, params->colormapId);
+}
+
+
+
+FjStatus fjWindowInit(FjApp *app, FjWindow *win, FjWindowParams *params)
 {
     win->app = app;
 
@@ -143,7 +137,7 @@ uint32_t fjAppInitWindow(FjApp *app, FjWindow *win, FjWindowParams *params)
         app->screen->black_pixel,
         XCB_EVENT_MASK_EXPOSURE
             | XCB_EVENT_MASK_STRUCTURE_NOTIFY,
-        app->colormapId
+        params->colormapId
     };
 
     xcb_create_window(
@@ -152,18 +146,13 @@ uint32_t fjAppInitWindow(FjApp *app, FjWindow *win, FjWindowParams *params)
         win->windowId,
         app->screen->root,
         0, 0, // X and Y, often ignored
-        params->width, params->height,
+        100, 70, // Width and height
         0, // border width
         XCB_WINDOW_CLASS_INPUT_OUTPUT,
-        app->windowVisualId,
+        params->windowVisualId,
         propertiesMask,
         properties
     );
-
-    win->width = params->width;
-    win->height = params->height;
-
-    fj_X11_WindowInitParams(win, params);
 
     xcb_atom_t protocols[] = {
         app->atom_NET_WM_SYNC_REQUEST,
@@ -183,17 +172,13 @@ uint32_t fjAppInitWindow(FjApp *app, FjWindow *win, FjWindowParams *params)
 
     fj_X11_WindowInitSyncCounter(win);
 
-    win->root = NULL;
-
-    return app->backend.initWindow(&app->backend, win);
+    return FJ_OK;
 }
 
 
 
 void fjWindowDestroy(FjWindow *win)
 {
-    struct FjBackend *bk = &win->app->backend;
-    bk->destroyWindow(bk, win);
     fj_X11_WindowDestroySyncCounter(win);
     xcb_destroy_window(win->app->connection, win->windowId);
 }
@@ -212,7 +197,7 @@ void fjWindowSetVisible(FjWindow *win, uint32_t visible)
 }
 
 
-uint32_t fjWindowSetTitle(FjWindow *win, const char *title)
+FjStatus fjWindowSetTitle(FjWindow *win, const char *title)
 {
     xcb_change_property(
         win->app->connection,

@@ -1,12 +1,8 @@
 #ifndef FEJIX_RUNTIME_DEV_X11_UTILS_H_
 #define FEJIX_RUNTIME_DEV_X11_UTILS_H_
 
-#include <fejix_runtime/fejix_runtime.h>
+#include <fejix_runtime/definitions.h>
 
-void fj_X11_WindowInitParams(
-    struct FjWindow *win,
-    struct FjWindowParams *params
-);
 
 void fj_X11_WindowInitSyncCounter(struct FjWindow *win);
 

@@ -30,6 +30,12 @@ if(FEJIX_USE_X11)
         "${ROOT}/src/platform/x11/utils.c"
     )
 
+    if(FEJIX_USE_VARSIZE)
+        target_sources(fejix_runtime PRIVATE
+            "${ROOT}/src/platform/x11/varsize.c"
+        )
+    endif()
+
     if(FEJIX_USE_OPENGL)
         target_sources(
             fejix_runtime PRIVATE
